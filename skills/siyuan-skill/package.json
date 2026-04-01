@@ -1,0 +1,111 @@
+{
+  "name": "siyuan-skill",
+  "version": "1.7.8",
+  "description": "思源笔记命令行工具，提供便捷的命令行操作方式，支持笔记本管理、文档操作、内容搜索、块控制等功能",
+  "main": "siyuan.js",
+  "bin": {
+    "siyuan": "./siyuan.js"
+  },
+  "keywords": [
+    "siyuan",
+    "notes",
+    "api",
+    "connector",
+    "skill",
+    "ai",
+    "agent"
+  ],
+  "author": "Siyuan Skills",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dazexcl/siyuan-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dazexcl/siyuan-skill/issues"
+  },
+  "homepage": "https://github.com/dazexcl/siyuan-skill#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "peerDependencies": {
+    "siyuan-notes": ">=3.6.0"
+  },
+  "skill": {
+    "skillType": "cli",
+    "runtime": "node",
+    "runtimeVersion": ">=14.0.0",
+    "homepage": "https://github.com/dazexcl/siyuan-skill",
+    "securityStatement": {
+      "configPersistence": "This skill uses a config-READONLY design. It does NOT provide any config-write capability. All config changes require manual user action.",
+      "tokenHandling": "SIYUAN_TOKEN is read ONLY from environment variables and config.json. It is NEVER written to disk by the skill. Token changes require manual user action."
+    },
+    "requiredEnvVars": [
+      {
+        "name": "SIYUAN_BASE_URL",
+        "description": "思源笔记 API 地址（建议使用 localhost）",
+        "required": true
+      },
+      {
+        "name": "SIYUAN_TOKEN",
+        "description": "API 认证令牌",
+        "required": true
+      },
+      {
+        "name": "SIYUAN_DEFAULT_NOTEBOOK",
+        "description": "默认笔记本 ID",
+        "required": true
+      }
+    ],
+    "optionalEnvVars": [
+      {
+        "name": "SIYUAN_PERMISSION_MODE",
+        "description": "权限模式",
+        "default": "all"
+      },
+      {
+        "name": "SIYUAN_NOTEBOOK_LIST",
+        "description": "白名单/黑名单笔记本列表"
+      },
+      {
+        "name": "SIYUAN_TIMEOUT",
+        "description": "API 请求超时时间（毫秒）",
+        "default": "10000"
+      },
+      {
+        "name": "SIYUAN_DELETE_SAFE_MODE",
+        "description": "删除安全模式",
+        "default": "true"
+      },
+      {
+        "name": "SIYUAN_DELETE_REQUIRE_CONFIRMATION",
+        "description": "删除需要确认",
+        "default": "false"
+      },
+      {
+        "name": "SIYUAN_TLS_ALLOW_SELF_SIGNED",
+        "description": "允许自签名 TLS 证书",
+        "default": "false"
+      },
+      {
+        "name": "SIYUAN_TLS_ALLOWED_HOSTS",
+        "description": "TLS 验证豁免的主机列表",
+        "default": "localhost"
+      }
+    ],
+    "security": {
+      "recommendedBaseUrl": "http://localhost:6806",
+      "tlsValidation": "enabled",
+      "sensitiveFields": ["token", "password", "apiKey"]
+    }
+  }
+}
