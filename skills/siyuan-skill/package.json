@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dazexcl/siyuan-skill.git"
+    "url": "https://github.com/wooyang2018/my-trex-skills.git"
   },
   "bugs": {
-    "url": "https://github.com/dazexcl/siyuan-skill/issues"
+    "url": "https://github.com/wooyang2018/my-trex-skills/issues"
   },
-  "homepage": "https://github.com/dazexcl/siyuan-skill#readme",
+  "homepage": "https://github.com/wooyang2018/my-trex-skills#readme",
   "engines": {
     "node": ">=14.0.0"
   },
@@ -44,7 +44,7 @@
     "skillType": "cli",
     "runtime": "node",
     "runtimeVersion": ">=14.0.0",
-    "homepage": "https://github.com/dazexcl/siyuan-skill",
+    "homepage": "https://github.com/wooyang2018/my-trex-skills",
     "securityStatement": {
       "configPersistence": "This skill uses a config-READONLY design. It does NOT provide any config-write capability. All config changes require manual user action.",
       "tokenHandling": "SIYUAN_TOKEN is read ONLY from environment variables and config.json. It is NEVER written to disk by the skill. Token changes require manual user action."

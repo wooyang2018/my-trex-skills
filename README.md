@@ -9,7 +9,7 @@
 ### 方式 A：Claude Code 插件目录（推荐）
 
 ```bash
-git clone https://github.com/dazexcl/siyuan-skill.git siyuan-notes
+git clone https://github.com/wooyang2018/my-trex-skills.git siyuan-notes
 claude --plugin-dir ./siyuan-notes
 ```
 
@@ -138,4 +138,4 @@ skills/
 
 ## 许可证
 
-MIT © [dazexcl](https://github.com/dazexcl)
+MIT © [wooyang2018](https://github.com/wooyang2018)

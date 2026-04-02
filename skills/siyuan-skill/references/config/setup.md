@@ -17,7 +17,7 @@
 
 ```bash
 # 克隆插件仓库
-git clone https://github.com/dazexcl/siyuan-skill.git siyuan-notes
+git clone https://github.com/wooyang2018/my-trex-skills.git siyuan-notes
 
 # 在 Claude Code 中以插件目录模式运行
 claude --plugin-dir ./siyuan-notes
@@ -44,7 +44,7 @@ claude --plugin-dir ./siyuan-notes
 cd <skills-directory>
 
 # 克隆仓库
-git clone https://github.com/dazexcl/siyuan-skill.git
+git clone https://github.com/wooyang2018/my-trex-skills.git
 
 # 进入技能目录
 cd siyuan-skill/skills/siyuan-skill

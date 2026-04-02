@@ -3,11 +3,11 @@
   "version": "1.7.8",
   "description": "思源笔记（SiYuan Notes）操作技能集，支持笔记本管理、文档 CRUD、块操作、内容搜索等功能",
   "author": {
-    "name": "dazexcl",
-    "url": "https://github.com/dazexcl"
+    "name": "wooyang2018",
+    "url": "https://github.com/wooyang2018"
   },
-  "homepage": "https://github.com/dazexcl/siyuan-skill",
-  "repository": "https://github.com/dazexcl/siyuan-skill",
+  "homepage": "https://github.com/wooyang2018/my-trex-skills",
+  "repository": "https://github.com/wooyang2018/my-trex-skills",
   "license": "MIT",
   "keywords": ["siyuan", "notes", "knowledge-base", "productivity", "chinese"]
 }
