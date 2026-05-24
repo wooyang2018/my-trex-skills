@@ -1,0 +1,42 @@
+skills/siyuan-sisyphus/scripts/excalidraw_compose.py
+  h_cf037dcb817b82 1-377,388-392,394-462
+  s_9588f34d40575e::t_83121fe0d5c286 378-387,393
+skills/siyuan-sisyphus/references/excalidraw-embed.md
+  h_cf037dcb817b82 3,5,11,14,16,55,57,59,61,63-66,69-90,93,95-98,102,107,110,112-126,129,131-134,137,139,141-149,151,153,155,157-158,160,162,164,166,168,170-172,176,182-184,186
+  s_9588f34d40575e::t_a90a41b2e28eda 20,24-25,29,31-33,35-46,48,50-53
+  s_9588f34d40575e::t_5048680380b8b0 135
+skills/siyuan-sisyphus/references/markup-guide.md
+  s_9588f34d40575e::t_7e53247841b2aa 360-361
+  h_cf037dcb817b82 304,314,324,334
+  s_9588f34d40575e::t_04b3ff4fe75ce8 358-359,362
+  s_9588f34d40575e::t_9fa2722c822219 58,64
+  s_9588f34d40575e::t_cc0976001d401b 67
+  s_9588f34d40575e::t_009e6f4a6f1311 112
+  s_9588f34d40575e::t_a2083d219701df 327
+  s_9588f34d40575e::t_23430ff86f18a4 303,307,317-318,320
+skills/siyuan-sisyphus/SKILL.md
+  s_9588f34d40575e::t_4d8345bb2f5b75 144
+  s_9588f34d40575e::t_5e6d87dc832b82 3
+  s_9588f34d40575e::t_9859f505c3fca3 192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.6",
+  "base_commit_sha": "9e4ebe6fa47c1e43241cf27225ce6329cd3be8f0",
+  "prompts": {},
+  "humans": {
+    "h_cf037dcb817b82": {
+      "author": "weyoungli <weyoungli@tencent.com>"
+    }
+  },
+  "sessions": {
+    "s_9588f34d40575e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6208558a9d3948af8d2ef9fd10a88c44",
+        "model": "unknown"
+      },
+      "human_author": "weyoungli <weyoungli@tencent.com>"
+    }
+  }
+}
