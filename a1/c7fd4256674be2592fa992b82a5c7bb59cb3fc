@@ -1,0 +1,50 @@
+skills/siyuan-sisyphus/references/database-av.md
+  s_9588f34d40575e::t_8dc2f844a20464 1-74
+skills/siyuan-sisyphus/references/file-export.md
+  s_9588f34d40575e::t_03cdda3ef0d5df 1-80
+skills/siyuan-sisyphus/references/tag-flashcard.md
+  s_9588f34d40575e::t_b206b9bc349c96 1-59
+skills/siyuan-sisyphus/references/browse-read.md
+  s_9588f34d40575e::t_492ee99b5ccd8a 1-103
+skills/siyuan-sisyphus/references/search-query.md
+  s_9588f34d40575e::t_36a2238c2e5e7c 1-93
+skills/siyuan-sisyphus/references/excalidraw-embed.md
+  h_cf037dcb817b82 1-142
+skills/siyuan-sisyphus/references/markup-guide.md
+  h_cf037dcb817b82 1-335,337,339,343,346-347,349-368
+  s_9588f34d40575e::t_9f6ae090624dd4 336,338,340-342,344-345,348
+skills/siyuan-sisyphus/SKILL.md
+  s_9588f34d40575e::t_2766f95d04abb4 191-192
+  h_cf037dcb817b82 1-2,4-139,147-173,175-190,193
+  s_9588f34d40575e::t_02ce755d9b089d 140-146
+  s_9588f34d40575e::t_6fe5111456f557 174
+  s_9588f34d40575e::t_b341cd7f024b6c 3
+skills/siyuan-sisyphus/references/create-edit.md
+  h_cf037dcb817b82 1-165
+skills/siyuan-sisyphus/references/system-config.md
+  h_cf037dcb817b82 1-115,117-119
+  s_9588f34d40575e::t_701ce0ee3bde67 116,120-121
+skills/siyuan-sisyphus/references/sql-reference.md
+  h_cf037dcb817b82 1-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.6",
+  "base_commit_sha": "a1c7fd4256674be2592fa992b82a5c7bb59cb3fc",
+  "prompts": {},
+  "humans": {
+    "h_cf037dcb817b82": {
+      "author": "weyoungli <weyoungli@tencent.com>"
+    }
+  },
+  "sessions": {
+    "s_9588f34d40575e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6208558a9d3948af8d2ef9fd10a88c44",
+        "model": "claude-opus-4.7-1m"
+      },
+      "human_author": "weyoungli <weyoungli@tencent.com>"
+    }
+  }
+}
