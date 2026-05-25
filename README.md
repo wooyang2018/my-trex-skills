@@ -11,22 +11,23 @@
 
 ### Claude Code
 
+本仓库同时是一个 Claude Code 插件市场。在 Claude Code 中：
+
 ```bash
-git clone https://github.com/wooyang2018/my-trex-skills.git
-claude --plugin-dir ./my-trex-skills
+/plugin marketplace add wooyang2018/my-trex-skills
+/plugin install my-trex-skills@my-trex-skills
 ```
+
+Claude Code 会读取 `.claude-plugin/marketplace.json`，加载同名插件。
 
 ### CodeBuddy
 
-将仓库克隆到本地后，在 CodeBuddy 中注册为插件目录即可。CodeBuddy 会自动发现 `skills/` 下的所有技能。
+本仓库同时是一个 CodeBuddy 插件市场（marketplace）。在 CodeBuddy 中：
 
-### 项目级安装
-
-```json
-{
-  "plugins": ["./my-trex-skills"]
-}
-```
+1. 打开「插件」面板 →「添加插件市场 / Add Marketplace」
+2. 填入仓库 URL：`https://github.com/wooyang2018/my-trex-skills`
+3. CodeBuddy 自动识别 `.codebuddy-plugin/marketplace.json`，加载名为 `my-trex-skills` 的插件
+4. 在插件列表中启用 `my-trex-skills@my-trex-skills`，`skills/` 下的所有 SKILL 自动可用
 
 ---
 
@@ -80,11 +81,11 @@ siyuan-sisyphus notebook list        # 列出笔记本
 ```
 my-trex-skills/
 ├── .claude-plugin/
-│   └── plugin.json              # Claude Code 插件清单
+│   └── marketplace.json         # Claude Code 市场清单（仓库自身即单插件市场）
 ├── .codebuddy-plugin/
-│   └── plugin.json              # CodeBuddy 插件清单
-├── Agents.md                    # AI Agent 协作守则
-├── CLAUDE.md                    # → Agents.md（软链接）
+│   └── marketplace.json         # CodeBuddy 市场清单（仓库自身即单插件市场）
+├── AGENTS.md                    # AI Agent 协作守则
+├── CLAUDE.md                    # → AGENTS.md（软链接）
 ├── README.md                    # 本文件
 └── skills/
     ├── defuddle/
@@ -127,7 +128,7 @@ skills/
 - 思源笔记仅连接本地实例（默认 `http://localhost:6806`）
 - Token 通过 `siyuan-sisyphus config` 管理，插件不提供写入功能
 - 危险操作（删除/移动/全局替换）执行前需用户明确确认
-- 详见 `Agents.md` 中的危险动作清单
+- 详见 `AGENTS.md` 中的危险动作清单
 
 ---
 
