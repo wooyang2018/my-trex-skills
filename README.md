@@ -1,127 +1,122 @@
-# siyuan-notes
+# my-trex-skills
 
-一个面向 Claude Code 的思源笔记（SiYuan Notes）插件，提供完整的笔记操作技能集。
+个人 AI 技能集合插件，兼容 Claude Code 与 CodeBuddy 双平台。包含以下技能：
+
+- **defuddle** — 用 Defuddle CLI 从网页提取干净 Markdown，替代 WebFetch
+- **siyuan-sisyphus** — 用 siyuan-sisyphus CLI 操作思源笔记（笔记本/文档/块/属性视图/搜索/标签/闪卡/Excalidraw）
 
 ---
 
 ## 安装
 
-### 方式 A：Claude Code 插件目录（推荐）
+### Claude Code
 
 ```bash
-git clone https://github.com/wooyang2018/my-trex-skills.git siyuan-notes
-claude --plugin-dir ./siyuan-notes
+git clone https://github.com/wooyang2018/my-trex-skills.git
+claude --plugin-dir ./my-trex-skills
 ```
 
-### 方式 B：项目级安装
+### CodeBuddy
 
-将仓库克隆到项目目录，然后在 Claude Code 配置中注册：
+将仓库克隆到本地后，在 CodeBuddy 中注册为插件目录即可。CodeBuddy 会自动发现 `skills/` 下的所有技能。
+
+### 项目级安装
 
 ```json
 {
-  "plugins": ["./siyuan-notes"]
+  "plugins": ["./my-trex-skills"]
 }
 ```
-
-安装后 Claude Code 自动发现并加载 `skills/` 目录下的所有技能，无需额外配置。
 
 ---
 
 ## 前置条件
 
-| 要求 | 版本 | 说明 |
-|------|------|------|
-| **Node.js** | >= 14.0.0 | 运行思源笔记 CLI 工具 |
-| **思源笔记** | >= 3.6.0 | 本地运行的思源笔记实例 |
+| 要求 | 说明 |
+|------|------|
+| **Node.js** ≥ 14 | 运行 Defuddle CLI |
+| **Defuddle CLI** | `npm install -g defuddle` |
+| **siyuan-sisyphus CLI** | 思源笔记命令行工具 |
+| **思源笔记** ≥ 3.6.0 | 本地运行的思源笔记实例 |
+| **Python** ≥ 3.8 | 仅 Excalidraw 嵌入功能需要 |
 
 ---
 
-## 环境变量
+## 技能概览
 
-在 Claude Code 或系统环境中配置以下变量：
+### defuddle
+
+从网页 URL 提取干净的 Markdown 内容，去除导航、广告和杂物以节省 token。
 
 ```bash
-# 必需
-SIYUAN_BASE_URL=http://localhost:6806
-SIYUAN_TOKEN=你的API令牌          # 思源笔记 → 设置 → 关于 → API Token
-SIYUAN_DEFAULT_NOTEBOOK=笔记本ID   # 运行 node skills/siyuan-skill/siyuan.js notebooks 获取
-
-# 可选
-SIYUAN_PERMISSION_MODE=all         # all / whitelist / blacklist
-SIYUAN_NOTEBOOK_LIST=id1,id2       # 白名单/黑名单笔记本列表
+defuddle parse <url> --md
 ```
 
-详细配置说明见 [环境变量文档](skills/siyuan-skill/references/config/environment.md) 和 [config.json 配置](skills/siyuan-skill/references/config/advanced.md)。
+适用场景：用户提供 URL 需要阅读、分析或摘要网页内容时使用。对于 `.md` 结尾的 URL 直接用 WebFetch。
 
----
+### siyuan-sisyphus
 
-## 技能列表
-
-### siyuan-skill
-
-操作思源笔记的完整技能，Claude Code 会在以下场景自动激活：
-
-- 管理笔记本（列出、查看结构）
-- 文档操作（创建、读取、更新、删除、移动、重命名）
-- 块操作（插入、更新、删除、移动、折叠）
-- 内容搜索（SQL 关键词搜索）
-- 标签、属性、图标管理
-- 路径与 ID 互转、文档存在性检查
-
-**示例触发场景：**
-
-> "在思源笔记中创建一篇关于 X 的文档"
-> "搜索思源笔记中关于项目 A 的内容"
-> "把这篇文档移动到项目 B 目录下"
-> "给文档 20260304051123-doaxgi4 设置标签"
-
-**CLI 直接使用：**
+通过 `siyuan-sisyphus` 命令行操作思源笔记的完整技能。
 
 ```bash
-cd skills/siyuan-skill
-node siyuan.js help              # 查看所有命令
-node siyuan.js notebooks         # 列出笔记本
-node siyuan.js search "关键词"   # 搜索内容
-node siyuan.js create "标题" "内容" --parent-id <notebookId>
+siyuan-sisyphus <tool> <action> [--flag value ...]
 ```
 
-详细命令文档见 [skills/siyuan-skill/references/commands/](skills/siyuan-skill/references/commands/)。
+覆盖 12 个工具：`fs`（文档文件操作）、`notebook`（笔记本管理）、`document`（文档元数据）、`block`（块级操作）、`av`（属性视图）、`search`（全文/SQL 检索）、`file`（资源与导出）、`tag`（标签）、`system`（配置）、`flashcard`（闪卡）、`mascot`（挂件）、`feedback`（反馈）。
+
+配置方式：
+
+```bash
+siyuan-sisyphus config list          # 查看当前配置
+siyuan-sisyphus notebook list        # 列出笔记本
+```
+
+详细配置见 `skills/siyuan-sisyphus/references/system-config.md`。
 
 ---
 
-## 插件结构
+## 目录结构
 
 ```
-siyuan-notes/
+my-trex-skills/
 ├── .claude-plugin/
-│   └── plugin.json              # 插件清单
+│   └── plugin.json              # Claude Code 插件清单
+├── .codebuddy-plugin/
+│   └── plugin.json              # CodeBuddy 插件清单
+├── Agents.md                    # AI Agent 协作守则
+├── CLAUDE.md                    # → Agents.md（软链接）
+├── README.md                    # 本文件
 └── skills/
-    └── siyuan-skill/            # 思源笔记操作技能
-        ├── SKILL.md             # 技能入口（Claude Code 自动加载）
-        ├── siyuan.js            # CLI 入口
-        ├── commands/            # 命令实现
-        ├── lib/                 # 核心业务逻辑
-        ├── utils/               # 工具函数
-        ├── config.js            # 配置管理
-        ├── connector.js         # API 连接器
-        ├── config.example.json  # 配置示例
+    ├── defuddle/
+    │   └── SKILL.md             # 网页内容提取技能
+    └── siyuan-sisyphus/
+        ├── SKILL.md             # 思源笔记 CLI 技能入口
+        ├── scripts/
+        │   └── excalidraw_compose.py  # Excalidraw SVG 合成脚本
         └── references/          # 详细参考文档
-            ├── commands/        # 各命令文档
-            ├── config/          # 配置文档
-            └── advanced/        # 最佳实践
+            ├── browse-read.md       # 浏览与读取
+            ├── create-edit.md       # 创建与编辑
+            ├── database-av.md       # 属性视图（数据库）
+            ├── excalidraw-embed.md  # Excalidraw 嵌入
+            ├── file-export.md       # 资源与导出
+            ├── markup-guide.md      # 思源专有语法
+            ├── search-query.md      # 搜索与查询
+            ├── sql-reference.md     # SQL 参考
+            ├── system-config.md     # 系统配置
+            └── tag-flashcard.md     # 标签与闪卡
 ```
 
 ---
 
 ## 添加更多技能
 
-在 `skills/` 目录下创建新子目录，放入 `SKILL.md` 后即可被 Claude Code 自动发现：
+在 `skills/` 目录下创建新子目录，放入 `SKILL.md`（含 frontmatter）后即可被自动发现：
 
 ```
 skills/
-├── siyuan-skill/        # 已有
-│   └── SKILL.md
-└── your-new-skill/      # 新增
+├── defuddle/
+├── siyuan-sisyphus/
+└── your-new-skill/
     └── SKILL.md
 ```
 
@@ -129,10 +124,10 @@ skills/
 
 ## 安全说明
 
-- 仅连接本地思源笔记实例（`http://localhost:6806`）
-- `SIYUAN_TOKEN` 仅通过环境变量或 `config.json` 读取，插件不提供 Token 写入功能
-- 删除操作默认禁用（`deleteProtection.safeMode: true`），需用户手动配置才能启用
-- 生产环境建议使用 `whitelist` 权限模式
+- 思源笔记仅连接本地实例（默认 `http://localhost:6806`）
+- Token 通过 `siyuan-sisyphus config` 管理，插件不提供写入功能
+- 危险操作（删除/移动/全局替换）执行前需用户明确确认
+- 详见 `Agents.md` 中的危险动作清单
 
 ---
 

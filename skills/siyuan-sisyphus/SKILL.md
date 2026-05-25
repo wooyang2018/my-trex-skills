@@ -141,7 +141,7 @@ siyuan-sisyphus search get_backlinks --id <blockOrDocId> --mode both --json
 
 写块引用 `((id '锚文本'))`、嵌入块 `{{ SELECT ... }}`、`#tag#` 标签、Mermaid/Chart/PlantUML/FlowChart/Graphviz/HTML 块、超级块、Callout 等参见 `references/markup-guide.md`。
 
-让 Agent 在思源文档中现场画一张可继续编辑的 Excalidraw 矢量图参见 `references/excalidraw-embed.md`，走 `scripts/excalidraw_compose.py`，不要手拼 base64 metadata。
+Excalidraw 可编辑矢量图嵌入 → 详见 `references/excalidraw-embed.md`（走 `scripts/excalidraw_compose.py`，需 Python ≥ 3.8）。
 
 ### 6. 危险操作（删除 / 移动 / 资源上传 / 全局替换）
 
