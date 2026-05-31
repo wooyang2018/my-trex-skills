@@ -5,6 +5,18 @@ description: 思源笔记 CLI 操作技能。当需要通过 siyuan-sisyphus 命
 
 # 思源笔记 siyuan-sisyphus 命令行技能
 
+## 安装说明
+
+**先决条件**: 确保已安装 Node.js (≥ 14.0.0)
+
+```bash
+# 全局安装 siyuan-sisyphus CLI 工具
+npm i -g siyuan-sisyphus
+
+# 验证安装
+siyuan-sisyphus --version
+```
+
 ## 概述
 
 本技能为通过 `siyuan-sisyphus` 命令行操作思源笔记提供统一规范。所有思源笔记的浏览、创建、编辑、搜索、属性视图、资源、标签、闪卡操作均通过该 CLI 完成，不直接调用 HTTP API、不写自定义脚本。
