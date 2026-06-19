@@ -1,6 +1,6 @@
 {
   "name": "my-trex-skills",
-  "description": "wooyang2018 个人 AI 技能市场：思源笔记 CLI 操作（siyuan-sisyphus）与网页内容提取（defuddle）",
+  "description": "wooyang2018 个人 AI 技能市场：思源笔记 CLI 操作（siyuan-sisyphus）、知识库引擎（wiki skills 基于 Karpathy LLM Wiki 模式）、网页内容提取（defuddle）",
   "owner": {
     "name": "wooyang2018",
     "url": "https://github.com/wooyang2018"
@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "my-trex-skills",
-      "description": "个人技能集合：思源笔记 CLI 操作技能（siyuan-sisyphus）与 Defuddle 网页内容提取技能",
-      "version": "2.0.0",
+      "description": "个人技能集合：思源笔记 CLI 操作技能（siyuan-sisyphus）、知识库引擎（8 个 wiki 技能 — 蒸馏/检索/审计/图维护/报告/综合）、Defuddle 网页内容提取技能",
+      "version": "5.0.0",
       "source": "./",
       "author": {
         "name": "wooyang2018",
@@ -22,6 +22,8 @@
         "siyuan",
         "notes",
         "knowledge-base",
+        "llm-wiki",
+        "karpathy",
         "defuddle",
         "web-content",
         "productivity",
