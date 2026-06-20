@@ -47,7 +47,7 @@ export interface ResolvedAnchor {
  *   1) Check whether text at target_lines still contains anchor_text. If yes, done.
  *   2) Otherwise, search the whole file for anchor_text. If exactly one match, use it.
  *   3) Otherwise, search for anchor_before + anchor_text + anchor_after. If exactly one match, use it.
- *   4) Otherwise return null — stale anchor, must be re-anchored by a human.
+ *   4) Otherwise return null: stale anchor, must be re-anchored by a human.
  */
 export function resolveAnchor(fileText: string, anchor: Anchor): ResolvedAnchor | null {
   // Step 1: line-based attempt.

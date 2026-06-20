@@ -3,7 +3,7 @@ import { z } from "zod";
 export const Severity = z.enum(["info", "suggest", "warn", "error"]);
 export type Severity = z.infer<typeof Severity>;
 
-export const AuditSource = z.enum(["obsidian-plugin", "web-viewer", "manual"]);
+export const AuditSource = z.enum(["web-viewer", "manual"]);
 export type AuditSource = z.infer<typeof AuditSource>;
 
 export const AuditStatus = z.enum(["open", "resolved"]);
@@ -23,7 +23,7 @@ export type Anchor = z.infer<typeof AnchorSchema>;
 
 /**
  * One feedback entry. Lives as a markdown file with YAML frontmatter.
- * Shared byte-for-byte between the Obsidian plugin and the web viewer.
+ * Shared byte-for-byte between the web viewer and any external audit producer.
  */
 export const AuditEntrySchema = z.object({
   id: z.string().regex(/^\d{8}-\d{6}-[0-9a-f]{4}$/),

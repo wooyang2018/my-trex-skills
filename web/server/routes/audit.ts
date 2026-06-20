@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { Request, Response } from "express";
 import {
   computeAnchor,
@@ -9,58 +7,61 @@ import {
   toMarkdown,
   type AuditEntry,
   type Severity,
-} from "audit-shared";
+} from "../../shared/audit/index.js";
 import type { ServerConfig } from "../config.js";
+import {
+  normalizeRelPath,
+  sqlString,
+  SiyuanCli,
+  workspacePath,
+} from "../content/siyuan-cli.js";
 
 const VALID_SEVERITIES: readonly Severity[] = ["info", "suggest", "warn", "error"];
 
-/** 审计功能目前仅支持本地模式。 */
-function requireLocalRoot(cfg: ServerConfig, res: Response): string | null {
-  if (!cfg.wikiRoot) {
-    res.status(501).json({ error: "audit not available in siyuan mode (requires local wiki root)" });
-    return null;
-  }
-  return cfg.wikiRoot;
+interface AuditDocRow {
+  id: string;
+  hpath: string;
+  name?: string;
+  updated?: string;
 }
 
 export function handleAuditList(cfg: ServerConfig) {
-  return (req: Request, res: Response) => {
-    const wikiRoot = requireLocalRoot(cfg, res);
-    if (!wikiRoot) return;
+  return async (req: Request, res: Response) => {
+    const cli = makeCli(cfg);
     const target = req.query.target as string | undefined;
     const mode = (req.query.mode as string | undefined) ?? "open";
 
-    const entries: AuditEntry[] = [];
-    const dirs: string[] = [];
-    if (mode === "open" || mode === "all") dirs.push(path.join(wikiRoot, "audit"));
-    if (mode === "resolved" || mode === "all") dirs.push(path.join(wikiRoot, "audit/resolved"));
-
-    for (const dir of dirs) {
-      if (!fs.existsSync(dir)) continue;
-      for (const name of fs.readdirSync(dir)) {
-        if (!name.endsWith(".md")) continue;
-        const full = path.join(dir, name);
-        if (!fs.statSync(full).isFile()) continue;
+    try {
+      const entries: AuditEntry[] = [];
+      const docs = await listAuditDocs(cli, cfg);
+      for (const doc of docs) {
+        const rel = normalizeRelPath(doc.hpath);
+        if (rel === "audit" || rel === "audit/resolved") continue;
+        if (!matchesMode(rel, mode)) continue;
         try {
-          const text = fs.readFileSync(full, "utf-8");
+          const text = await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, rel), "--page-size", "8000"]);
           const entry = fromMarkdown(text);
-          if (target && entry.target !== target) continue;
+          if (target && normalizeTarget(entry.target) !== normalizeTarget(target)) continue;
+          if (mode === "open" && entry.status !== "open") continue;
+          if (mode === "resolved" && entry.status !== "resolved") continue;
           entries.push(entry);
         } catch (err) {
-          console.warn(`skipping malformed audit ${full}: ${String(err)}`);
+          console.warn(`skipping malformed audit ${doc.hpath}: ${String(err)}`);
         }
       }
-    }
 
-    entries.sort((a, b) => a.created.localeCompare(b.created));
-    res.json({ entries });
+      entries.sort((a, b) => a.created.localeCompare(b.created));
+      res.json({ entries });
+    } catch (err) {
+      console.error("failed to list audits", err);
+      res.status(500).json({ error: "failed to list audits", detail: String(err) });
+    }
   };
 }
 
 export function handleAuditCreate(cfg: ServerConfig) {
-  return (req: Request, res: Response) => {
-    const wikiRoot = requireLocalRoot(cfg, res);
-    if (!wikiRoot) return;
+  return async (req: Request, res: Response) => {
+    const cli = makeCli(cfg);
     try {
       const {
         target,
@@ -101,23 +102,14 @@ export function handleAuditCreate(cfg: ServerConfig) {
         return;
       }
 
-      // Make sure the target file exists inside the wiki root.
-      const targetFull = path.join(wikiRoot, target);
-      if (!fs.existsSync(targetFull) || !fs.statSync(targetFull).isFile()) {
-        res.status(404).json({ error: "target file not found", target });
-        return;
-      }
+      await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, target), "--page-size", "1"]);
+      await ensureAuditRoots(cli, cfg);
 
-      // Compute anchor from the raw markdown the client sent
       const anchor = computeAnchor(rawMarkdown, selStart, selEnd);
-
       const id = makeId();
       const slug = comment.trim().split(/\s+/).slice(0, 5).join(" ");
-      const filename = filenameFor(id, slug);
-      const auditDir = path.join(wikiRoot, "audit");
-      fs.mkdirSync(auditDir, { recursive: true });
-      const outPath = path.join(auditDir, filename);
-
+      const docName = filenameFor(id, slug).replace(/\.md$/i, "");
+      const relPath = `audit/${docName}`;
       const entry: AuditEntry = {
         id,
         target,
@@ -133,8 +125,17 @@ export function handleAuditCreate(cfg: ServerConfig) {
         body: `# Comment\n\n${comment.trim()}\n\n# Resolution\n\n<!-- filled in when the audit is processed -->\n`,
       };
 
-      fs.writeFileSync(outPath, toMarkdown(entry), "utf-8");
-      res.json({ id, filename, path: path.relative(wikiRoot, outPath).split(path.sep).join("/"), entry });
+      await cli.run([
+        "fs",
+        "write",
+        "--path",
+        workspacePath(cfg.notebookName, relPath),
+        "--markdown",
+        toMarkdown(entry),
+        "--overwrite",
+      ]);
+      await writeAuditAttrs(cli, cfg, relPath, entry);
+      res.json({ id, filename: docName, path: `wiki/${relPath}`, entry });
     } catch (err) {
       console.error("failed to create audit", err);
       res.status(500).json({ error: "failed to create audit", detail: String(err) });
@@ -143,9 +144,8 @@ export function handleAuditCreate(cfg: ServerConfig) {
 }
 
 export function handleAuditResolve(cfg: ServerConfig) {
-  return (req: Request, res: Response) => {
-    const wikiRoot = requireLocalRoot(cfg, res);
-    if (!wikiRoot) return;
+  return async (req: Request, res: Response) => {
+    const cli = makeCli(cfg);
     try {
       const id = req.params.id;
       if (!id || !/^\d{8}-\d{6}-[0-9a-f]{4}$/.test(id)) {
@@ -153,21 +153,17 @@ export function handleAuditResolve(cfg: ServerConfig) {
         return;
       }
       const { resolution } = req.body as { resolution?: string };
-
-      const openDir = path.join(wikiRoot, "audit");
-      const resolvedDir = path.join(wikiRoot, "audit/resolved");
-      fs.mkdirSync(resolvedDir, { recursive: true });
-
-      // Find the file whose name starts with the id.
-      const candidate = fs.readdirSync(openDir).find((f) => f.startsWith(id));
-      if (!candidate) {
-        res.status(404).json({ error: "no open audit with that id" });
+      const doc = (await listAuditDocs(cli, cfg)).find((row) =>
+        normalizeRelPath(row.hpath).split("/").pop()?.startsWith(id),
+      );
+      if (!doc) {
+        res.status(404).json({ error: "no audit with that id" });
         return;
       }
-      const openPath = path.join(openDir, candidate);
-      const text = fs.readFileSync(openPath, "utf-8");
-      const entry = fromMarkdown(text);
 
+      const rel = normalizeRelPath(doc.hpath);
+      const text = await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, rel), "--page-size", "8000"]);
+      const entry = fromMarkdown(text);
       const today = new Date().toISOString().slice(0, 10);
       const newBody = replaceResolution(
         entry.body,
@@ -175,10 +171,17 @@ export function handleAuditResolve(cfg: ServerConfig) {
       );
       const resolvedEntry: AuditEntry = { ...entry, status: "resolved", body: newBody };
 
-      const resolvedPath = path.join(resolvedDir, candidate);
-      fs.writeFileSync(resolvedPath, toMarkdown(resolvedEntry), "utf-8");
-      fs.unlinkSync(openPath);
-      res.json({ id, from: openPath, to: resolvedPath });
+      await cli.run([
+        "fs",
+        "write",
+        "--path",
+        workspacePath(cfg.notebookName, rel),
+        "--markdown",
+        toMarkdown(resolvedEntry),
+        "--overwrite",
+      ]);
+      await writeAuditAttrs(cli, cfg, rel, resolvedEntry);
+      res.json({ id, path: `wiki/${rel}`, status: "resolved" });
     } catch (err) {
       console.error("failed to resolve audit", err);
       res.status(500).json({ error: "failed to resolve audit", detail: String(err) });
@@ -186,8 +189,103 @@ export function handleAuditResolve(cfg: ServerConfig) {
   };
 }
 
+function makeCli(cfg: ServerConfig): SiyuanCli {
+  return new SiyuanCli({ profile: cfg.profile, timeoutMs: cfg.cliTimeoutMs });
+}
+
+async function listAuditDocs(cli: SiyuanCli, cfg: ServerConfig): Promise<AuditDocRow[]> {
+  return cli.json<AuditDocRow[]>([
+    "search",
+    "query_sql",
+    "--sql",
+    `SELECT id, hpath, name, updated FROM blocks WHERE box=${sqlString(cfg.notebookId)} AND type='d' AND hpath LIKE '/audit/%' ORDER BY updated DESC LIMIT 1000`,
+    "--json",
+  ]);
+}
+
+function matchesMode(rel: string, mode: string): boolean {
+  if (mode === "all") return true;
+  if (mode === "resolved") return rel.startsWith("audit/resolved/");
+  return !rel.startsWith("audit/resolved/");
+}
+
+async function ensureAuditRoots(cli: SiyuanCli, cfg: ServerConfig): Promise<void> {
+  await ensureDoc(cli, cfg, "audit", "# Audit\n");
+  await ensureDoc(cli, cfg, "audit/resolved", "# Resolved Audits\n");
+}
+
+async function ensureDoc(cli: SiyuanCli, cfg: ServerConfig, rel: string, markdown: string): Promise<void> {
+  try {
+    await lookupDocId(cli, cfg, rel);
+    return;
+  } catch {
+    await cli.run(["fs", "write", "--path", workspacePath(cfg.notebookName, rel), "--markdown", markdown]);
+  }
+}
+
+async function writeAuditAttrs(
+  cli: SiyuanCli,
+  cfg: ServerConfig,
+  rel: string,
+  entry: AuditEntry,
+): Promise<void> {
+  const docId = await lookupDocId(cli, cfg, rel);
+  await cli.run([
+    "block",
+    "set_attrs",
+    "--id",
+    docId,
+    "--attrs-json",
+    JSON.stringify({
+      "custom-title": entry.id,
+      "custom-category": "audit",
+      "custom-tags": `audit,${entry.severity},${entry.status}`,
+      "custom-sources": entry.target,
+      "custom-summary": entry.body.replace(/^#\s*Comment\s*/i, "").split(/^#\s*Resolution/im)[0]?.trim() ?? "",
+      "custom-status": entry.status,
+      "custom-target": entry.target,
+      "custom-updated": new Date().toISOString(),
+    }),
+  ]);
+}
+
+async function lookupDocId(cli: SiyuanCli, cfg: ServerConfig, rel: string): Promise<string> {
+  const result = await cli.json<unknown>([
+    "document",
+    "lookup",
+    "--notebook",
+    cfg.notebookId,
+    "--hpath",
+    `/${normalizeRelPath(rel)}`,
+    "--include",
+    '["id","hpath"]',
+    "--json",
+  ]);
+  const id = extractId(result);
+  if (!id) throw new Error(`document lookup did not return id for ${rel}`);
+  return id;
+}
+
+function extractId(value: unknown): string | null {
+  if (value && typeof value === "object") {
+    const maybe = value as { id?: unknown; data?: unknown };
+    if (typeof maybe.id === "string") return maybe.id;
+    if (maybe.data) return extractId(maybe.data);
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const id = extractId(item);
+      if (id) return id;
+    }
+  }
+  return null;
+}
+
+function normalizeTarget(target: string): string {
+  return normalizeRelPath(target);
+}
+
 function replaceResolution(body: string, newBlock: string): string {
-  // Find "# Resolution" section; replace or append.
   const re = /# Resolution[\s\S]*$/;
   if (re.test(body)) {
     return body.replace(re, `# Resolution\n\n${newBlock}`);

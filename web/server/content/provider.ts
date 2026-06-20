@@ -1,15 +1,13 @@
 /**
  * ContentProvider — 抽象数据源接口。
  *
- * llm-wiki 的所有数据读取都通过这个接口进行。
- * 两种实现：
- *   - LocalContentProvider  ← 读取本地 .md 文件（原架构）
- *   - SiYuanContentProvider ← 通过 SiYuan HTTP API 直连（方案 A）
+ * llm-wiki 的所有数据读取都通过这个接口进行，当前唯一实现是
+ * SiyuanCliContentProvider：通过 siyuan-sisyphus CLI 访问思源。
  */
 
 /** 单个 wiki 页面的数据。 */
 export interface WikiPage {
-  /** 相对路径，如 "wiki/concepts/Transformers.md" 或 "concepts/Transformers" */
+  /** 相对路径，如 "wiki/concepts/Transformers" 或 "concepts/Transformers" */
   path: string;
   /** 显示标题（frontmatter title > h1 > stem） */
   title: string | null;
@@ -53,7 +51,7 @@ export interface ContentGraphData {
  * 内容提供者接口。
  *
  * 所有路由 handler 只依赖此接口，不直接调用 fs 或 HTTP。
- * 方法均为 async，因为 SiYuanContentProvider 需要网络请求。
+ * 方法均为 async，因为底层 CLI 调用是异步的。
  */
 export interface ContentProvider {
   /** 获取目录树。 */

@@ -1,5 +1,5 @@
 import mermaid from "mermaid";
-import type { AuditEntry } from "audit-shared";
+import type { AuditEntry } from "../shared/audit/index.js";
 import { renderTree } from "./tree.js";
 import { installFeedbackUI } from "./feedback.js";
 import { renderGraph, type GraphData, type GraphNode } from "./graph.js";
@@ -14,7 +14,7 @@ interface PageResponse {
 }
 
 const state = {
-  currentPath: "wiki/index.md" as string,
+  currentPath: "wiki/index" as string,
   rawMarkdown: "" as string,
   author: "me" as string,
   graphTeardown: null as (() => void) | null,
@@ -85,17 +85,17 @@ async function main() {
   });
 
   // Initial page.
-  const initial = new URL(window.location.href).searchParams.get("page") ?? "wiki/index.md";
+  const initial = new URL(window.location.href).searchParams.get("page") ?? "wiki/index";
   await loadPage(initial);
 
   window.addEventListener("popstate", (e) => {
-    const p = (e.state && e.state.page) || new URL(window.location.href).searchParams.get("page") || "wiki/index.md";
+    const p = (e.state && e.state.page) || new URL(window.location.href).searchParams.get("page") || "wiki/index";
     void loadPage(p);
   });
 
   // Intercept wikilinks so navigation stays in the SPA.
   document.getElementById("page-content")!.addEventListener("click", (e) => {
-    const target = (e.target as HTMLElement).closest("a.wikilink") as HTMLAnchorElement | null;
+    const target = (e.target as HTMLElement).closest('a.wikilink, a[href*="?page="]') as HTMLAnchorElement | null;
     if (!target) return;
     const href = target.getAttribute("href") ?? "";
     const u = new URL(href, window.location.href);

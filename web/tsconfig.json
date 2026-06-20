@@ -13,6 +13,6 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["server/**/*.ts", "client/**/*.ts", "build-client.mjs"],
+  "include": ["server/**/*.ts", "client/**/*.ts", "shared/**/*.ts", "build-client.mjs"],
   "exclude": ["node_modules", "dist"]
 }

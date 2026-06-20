@@ -44,20 +44,20 @@ export function cleanKramdown(kramdown: string): string {
 /**
  * 正则匹配思源块引用: ((block-id "text")) 或 ((block-id))
  */
-const BLOCK_REF_RE = /\(\(([0-9]{14}-[a-z0-9]+)(?:\s+'([^']*)')?\)\)/g;
+const BLOCK_REF_RE = /\(\(([0-9]{14}-[a-z0-9]+)(?:\s+(?:"([^"]*)"|'([^']*)'))?\)\)/g;
 
 /**
  * 将 ((block-id "text")) 替换为 markdown 链接。
  *
  * 由于运行时无法在此同步函数中查询 block-id 对应的文档路径，
  * 我们生成一个以 block-id 为目标的链接，前端路由会通过
- * SiYuanContentProvider.resolveLink 解析。
+ * ContentProvider.resolveLink 解析。
  *
  * 如果有显示文本则使用显示文本，否则使用 block-id 的短形式。
  */
 export function replaceBlockRefs(text: string): string {
-  return text.replace(BLOCK_REF_RE, (_match, blockId: string, displayText?: string) => {
-    const label = displayText || blockId.slice(-8);
+  return text.replace(BLOCK_REF_RE, (_match, blockId: string, doubleText?: string, singleText?: string) => {
+    const label = doubleText || singleText || blockId.slice(-8);
     return `[${label}](?page=${encodeURIComponent(blockId)})`;
   });
 }
@@ -66,11 +66,11 @@ export function replaceBlockRefs(text: string): string {
  * 处理嵌入语法 !((block-id "text"))
  * 转换为可点击的 markdown 链接，与块引用一致。
  */
-const EMBED_REF_RE = /!\(\(([0-9]{14}-[a-z0-9]+)(?:\s+'([^']*)')?\)\)/g;
+const EMBED_REF_RE = /!\(\(([0-9]{14}-[a-z0-9]+)(?:\s+(?:"([^"]*)"|'([^']*)'))?\)\)/g;
 
 export function replaceEmbeds(text: string): string {
-  return text.replace(EMBED_REF_RE, (_match, blockId: string, displayText?: string) => {
-    const label = displayText || blockId.slice(-8);
+  return text.replace(EMBED_REF_RE, (_match, blockId: string, doubleText?: string, singleText?: string) => {
+    const label = doubleText || singleText || blockId.slice(-8);
     return `[${label}](?page=${encodeURIComponent(blockId)})`;
   });
 }

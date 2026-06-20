@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local wiki preview + audit feedback server for the llm-wiki skill.",
+  "description": "SiYuan CLI-backed wiki reader and audit feedback server for the llm-wiki skill.",
   "scripts": {
     "build": "node build-client.mjs",
     "prestart": "npm run build",
@@ -11,7 +11,6 @@
     "dev": "tsx watch server/index.ts"
   },
   "dependencies": {
-    "audit-shared": "file:../audit-shared",
     "d3-drag": "^3.0.0",
     "d3-force": "^3.0.0",
     "d3-selection": "^3.0.0",
@@ -23,7 +22,8 @@
     "markdown-it-anchor": "^9.0.1",
     "markdown-it-attrs": "^4.2.0",
     "markdown-it-texmath": "^1.0.0",
-    "mermaid": "^10.9.0"
+    "mermaid": "^10.9.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/d3-drag": "^3.0.7",

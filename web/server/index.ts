@@ -2,14 +2,12 @@ import express from "express";
 import path from "node:path";
 import url from "node:url";
 import fs from "node:fs";
-import { parseArgs, type ServerConfig } from "./config.js";
+import { parseArgs } from "./config.js";
 import { createContentProvider } from "./content/factory.js";
-import type { ContentProvider } from "./content/provider.js";
 import { handleTree } from "./routes/tree.js";
 import { handlePage, handleRaw } from "./routes/pages.js";
 import { handleAuditList, handleAuditCreate, handleAuditResolve } from "./routes/audit.js";
 import { handleGraph } from "./routes/graph.js";
-import { createRenderer } from "./render/markdown.js";
 
 const cfg = parseArgs(process.argv);
 
@@ -30,8 +28,10 @@ app.patch("/api/audit/:id/resolve", handleAuditResolve(cfg));
 app.get("/api/config", (_req, res) => {
   res.json({
     author: cfg.author,
-    wikiRoot: cfg.wikiRoot ? path.basename(cfg.wikiRoot) : cfg.siyuanNotebook,
     mode: cfg.mode,
+    notebookId: cfg.notebookId,
+    notebookName: cfg.notebookName,
+    profile: cfg.profile ?? null,
   });
 });
 
@@ -58,10 +58,7 @@ app.get("/", (_req, res) => {
 app.listen(cfg.port, cfg.host, () => {
   console.log(`llm-wiki web server listening on http://${cfg.host}:${cfg.port}`);
   console.log(`  mode:      ${cfg.mode}`);
-  if (cfg.mode === "siyuan") {
-    console.log(`  siyuan:    ${cfg.siyuanApi} (notebook: ${cfg.siyuanNotebook})`);
-  } else {
-    console.log(`  wiki root: ${cfg.wikiRoot}`);
-  }
+  console.log(`  notebook:  ${cfg.notebookName} (${cfg.notebookId})`);
+  if (cfg.profile) console.log(`  profile:   ${cfg.profile}`);
   console.log(`  author:    ${cfg.author}`);
 });
