@@ -1,0 +1,22 @@
+README.md
+  h_cf037dcb817b82 99,111
+.gitignore
+  h_cf037dcb817b82 146
+AGENTS.md
+  h_cf037dcb817b82 83-84
+skills/llm-wiki/SKILL.md
+  h_cf037dcb817b82 29
+skills/llm-wiki/references/setup.md
+  h_cf037dcb817b82 13,15,17-19,21-33,35-39,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.6",
+  "base_commit_sha": "681e2e1ea486223c2f2ae20b92ebc2357aef4ff6",
+  "prompts": {},
+  "humans": {
+    "h_cf037dcb817b82": {
+      "author": "weyoungli <weyoungli@tencent.com>"
+    }
+  }
+}
