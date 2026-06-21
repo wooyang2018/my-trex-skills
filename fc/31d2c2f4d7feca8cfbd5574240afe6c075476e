@@ -1,0 +1,37 @@
+skills/llm-wiki/SKILL.md
+  s_1dd9497b80b28d::t_e585d971bddbca 64
+  s_1dd9497b80b28d::t_6b9658bca669bf 32
+web/server/routes/audit.ts
+  s_1dd9497b80b28d::t_4642c76a77fe88 205-207,234-236
+  s_1dd9497b80b28d::t_0f93b8c3199491 5,7,42,133,164,178,204,208-221
+  s_1dd9497b80b28d::t_697905106441b9 277,279-287
+web/test/e2e-audit-write.mjs
+  s_1dd9497b80b28d::t_d6e3f378b9f868 77,84,86-87,91-93,96-99
+skills/llm-wiki/references/writing.md
+  s_1dd9497b80b28d::t_742fc97afc6b27 81
+  s_1dd9497b80b28d::t_de08a48d5159c9 17-20,22,58,70,82-92,95
+  s_1dd9497b80b28d::t_589fd6a47f1d51 21
+web/shared/audit/serialize.ts
+  s_1dd9497b80b28d::t_0e3c0d2744cb3d 5,7,9,13,15-17,19-22,24,27-40
+  s_1dd9497b80b28d::t_17fbac9b3d7ec9 4
+skills/llm-wiki/references/maintain.md
+  s_1dd9497b80b28d::t_5ed61b9e2595df 50
+skills/llm-wiki/references/ingest.md
+  s_1dd9497b80b28d::t_5277a67fc5fd6b 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.6",
+  "base_commit_sha": "fc31d2c2f4d7feca8cfbd5574240afe6c075476e",
+  "prompts": {},
+  "sessions": {
+    "s_1dd9497b80b28d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cfff8da-ddc8-4603-9713-efd50fe41829",
+        "model": "unknown"
+      },
+      "human_author": "weyoungli <weyoungli@tencent.com>"
+    }
+  }
+}
