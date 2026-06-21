@@ -1,81 +1,43 @@
-import * as yaml from "js-yaml";
 import { AuditEntrySchema, type AuditEntry } from "./schema.js";
 
-const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/;
-const ANY_FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n?/gm;
-
 /**
- * Render an AuditEntry as the full markdown file contents
- * (YAML frontmatter + body). The body typically contains the
- * `# Comment` and optional `# Resolution` sections.
+ * Render an AuditEntry as body content only (no YAML frontmatter).
+ * The body contains the `# Comment` and optional `# Resolution` sections.
  */
-export function toMarkdown(entry: AuditEntry): string {
+export function toBody(entry: AuditEntry): string {
   const bodyText = entry.body && entry.body.trim().length > 0 ? entry.body : defaultBody();
-  return `---\n${frontmatter(entry)}---\n\n${bodyText.trimEnd()}\n`;
+  return bodyText.trimEnd() + "\n";
 }
 
 /**
- * Parse the full markdown contents of an audit file back into an AuditEntry.
- * Throws if the frontmatter is missing or fails schema validation.
+ * Build an AuditEntry from custom-* attributes and body text.
  */
-export function fromMarkdown(text: string): AuditEntry {
-  const m = FRONTMATTER_RE.exec(text);
-  if (m) {
-    const frontRaw = parseFrontmatter(m[1]!);
-    if (looksLikeAuditFrontmatter(frontRaw)) {
-      const body = (m[2] ?? "").replace(/^\n/, "");
-      return AuditEntrySchema.parse({ ...frontRaw, body });
-    }
-  }
-
-  for (const match of text.matchAll(ANY_FRONTMATTER_RE)) {
-    const frontRaw = parseFrontmatter(match[1]!);
-    if (!looksLikeAuditFrontmatter(frontRaw)) continue;
-    const body = text.slice((match.index ?? 0) + match[0].length).replace(/^\n/, "");
-    return AuditEntrySchema.parse({ ...frontRaw, body });
-  }
-
-  throw new Error("audit file is missing audit YAML frontmatter");
-}
-
-function parseFrontmatter(text: string): Record<string, unknown> | null {
+export function fromAttrsAndBody(attrs: Record<string, string>, body: string): AuditEntry {
+  const targetLinesRaw = attrs["custom-target-lines"] ?? "[]";
+  let targetLines: [number, number] = [1, 1];
   try {
-    const value = yaml.load(text);
-    return value && typeof value === "object" ? value as Record<string, unknown> : null;
+    const parsed = JSON.parse(targetLinesRaw);
+    if (Array.isArray(parsed) && parsed.length === 2 && typeof parsed[0] === "number" && typeof parsed[1] === "number") {
+      targetLines = parsed as [number, number];
+    }
   } catch {
-    return null;
+    // fallback to default
   }
-}
 
-function looksLikeAuditFrontmatter(value: unknown): value is Record<string, unknown> {
-  return Boolean(
-    value &&
-      typeof value === "object" &&
-      "id" in value &&
-      "target" in value &&
-      "status" in value,
-  );
-}
-
-function frontmatter(entry: AuditEntry): string {
-  return [
-    `id: ${scalar(entry.id)}`,
-    `target: ${scalar(entry.target)}`,
-    `target_lines: [${entry.target_lines[0]}, ${entry.target_lines[1]}]`,
-    `anchor_before: ${scalar(entry.anchor_before)}`,
-    `anchor_text: ${scalar(entry.anchor_text)}`,
-    `anchor_after: ${scalar(entry.anchor_after)}`,
-    `severity: ${scalar(entry.severity)}`,
-    `author: ${scalar(entry.author)}`,
-    `source: ${scalar(entry.source)}`,
-    `created: ${scalar(entry.created)}`,
-    `status: ${scalar(entry.status)}`,
-    "",
-  ].join("\n");
-}
-
-function scalar(value: string): string {
-  return JSON.stringify(value);
+  return AuditEntrySchema.parse({
+    id: attrs["custom-id"] ?? "",
+    target: attrs["custom-target"] ?? "",
+    target_lines: targetLines,
+    anchor_before: attrs["custom-anchor-before"] ?? "",
+    anchor_text: attrs["custom-anchor-text"] ?? "",
+    anchor_after: attrs["custom-anchor-after"] ?? "",
+    severity: attrs["custom-severity"] ?? "info",
+    author: attrs["custom-author"] ?? "",
+    source: attrs["custom-source"] ?? "web-viewer",
+    created: attrs["custom-created"] ?? new Date().toISOString(),
+    status: attrs["custom-status"] ?? "open",
+    body: body ?? "",
+  });
 }
 
 function defaultBody(): string {

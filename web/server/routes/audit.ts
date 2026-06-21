@@ -2,9 +2,9 @@ import type { Request, Response } from "express";
 import {
   computeAnchor,
   filenameFor,
-  fromMarkdown,
+  fromAttrsAndBody,
   makeId,
-  toMarkdown,
+  toBody,
   type AuditEntry,
   type Severity,
 } from "../../shared/audit/index.js";
@@ -39,8 +39,7 @@ export function handleAuditList(cfg: ServerConfig) {
         if (rel === "audit" || rel === "audit/resolved") continue;
         if (!matchesMode(rel, mode)) continue;
         try {
-          const text = await readMarkdown(cli, cfg, rel);
-          const entry = fromMarkdown(text);
+          const entry = await readAuditEntry(cli, cfg, doc.id, rel);
           if (target && normalizeTarget(entry.target) !== normalizeTarget(target)) continue;
           if (mode === "open" && entry.status !== "open") continue;
           if (mode === "resolved" && entry.status !== "resolved") continue;
@@ -131,7 +130,7 @@ export function handleAuditCreate(cfg: ServerConfig) {
         "--path",
         workspacePath(cfg.workspaceNotebook, relPath),
         "--markdown",
-        toMarkdown(entry),
+        toBody(entry),
         "--overwrite",
       ]);
       await writeAuditAttrs(cli, cfg, relPath, entry);
@@ -162,8 +161,7 @@ export function handleAuditResolve(cfg: ServerConfig) {
       }
 
       const rel = normalizeRelPath(doc.hpath);
-      const text = await readMarkdown(cli, cfg, rel);
-      const entry = fromMarkdown(text);
+      const entry = await readAuditEntry(cli, cfg, doc.id, rel);
       const today = new Date().toISOString().slice(0, 10);
       const newBody = replaceResolution(
         entry.body,
@@ -177,7 +175,7 @@ export function handleAuditResolve(cfg: ServerConfig) {
         "--path",
         workspacePath(cfg.workspaceNotebook, rel),
         "--markdown",
-        toMarkdown(resolvedEntry),
+        toBody(resolvedEntry),
         "--overwrite",
       ]);
       await writeAuditAttrs(cli, cfg, rel, resolvedEntry);
@@ -203,7 +201,24 @@ async function listAuditDocs(cli: SiyuanCli, cfg: ServerConfig): Promise<AuditDo
   ]);
 }
 
-async function readMarkdown(cli: SiyuanCli, cfg: ServerConfig, rel: string): Promise<string> {
+async function readAuditEntry(cli: SiyuanCli, cfg: ServerConfig, docId: string, rel: string): Promise<AuditEntry> {
+  const attrs = await readAttrs(cli, docId);
+  const body = await readBody(cli, cfg, rel);
+  return fromAttrsAndBody(attrs, body);
+}
+
+async function readAttrs(cli: SiyuanCli, docId: string): Promise<Record<string, string>> {
+  const result = await cli.json<Record<string, string>>([
+    "block",
+    "get_attrs",
+    "--id",
+    docId,
+    "--json",
+  ]);
+  return result ?? {};
+}
+
+async function readBody(cli: SiyuanCli, cfg: ServerConfig, rel: string): Promise<string> {
   const result = await cli.json<{ content?: string }>([
     "fs",
     "read",
@@ -216,7 +231,9 @@ async function readMarkdown(cli: SiyuanCli, cfg: ServerConfig, rel: string): Pro
   if (typeof result.content !== "string") {
     throw new Error(`fs read did not return content for ${rel}`);
   }
-  return result.content;
+  // Strip SiYuan auto-generated frontmatter
+  const m = /^---\n[\s\S]*?\n---\n?/.exec(result.content);
+  return m ? result.content.slice(m[0].length) : result.content;
 }
 
 function matchesMode(rel: string, mode: string): boolean {
@@ -257,8 +274,17 @@ async function writeAuditAttrs(
       "custom-tags": `audit,${entry.severity},${entry.status}`,
       "custom-sources": entry.target,
       "custom-summary": entry.body.replace(/^#\s*Comment\s*/i, "").split(/^#\s*Resolution/im)[0]?.trim() ?? "",
-      "custom-status": entry.status,
+      "custom-id": entry.id,
       "custom-target": entry.target,
+      "custom-target-lines": JSON.stringify(entry.target_lines),
+      "custom-anchor-before": entry.anchor_before,
+      "custom-anchor-text": entry.anchor_text,
+      "custom-anchor-after": entry.anchor_after,
+      "custom-severity": entry.severity,
+      "custom-author": entry.author,
+      "custom-source": entry.source,
+      "custom-created": entry.created,
+      "custom-status": entry.status,
       "custom-updated": new Date().toISOString(),
     }),
   ]);

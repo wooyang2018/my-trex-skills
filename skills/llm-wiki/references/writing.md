@@ -14,22 +14,17 @@ Use this before writing or restructuring wiki pages.
 
 Split a concept when it would exceed about 1200 words or when several sections deserve independent links. Create `concepts/<topic>` as the overview page, then focused child pages under it.
 
+## Key rule: no body frontmatter or `# Title`
+
+SiYuan auto-generates a frontmatter block and `# Title` heading for every document. Adding a second YAML frontmatter or `# Title` in the body causes duplicate rendering — the second frontmatter appears as raw text.
+
+**Correct**: Start body content directly with the one-sentence definition. Audit documents also follow this rule — all metadata is stored in custom-* attrs.
+
 ## Templates
 
 Concept:
 
 ```markdown
----
-title: <Title>
-category: concepts
-tags: [tag]
-sources: [source-id]
-created: <ISO>
-updated: <ISO>
----
-
-# <Title>
-
 One-sentence definition.
 
 ## What It Is
@@ -48,17 +43,6 @@ One-sentence definition.
 Entity:
 
 ```markdown
----
-title: <Name>
-category: entities
-tags: [person|tool|paper|organization]
-sources: [source-id]
-created: <ISO>
-updated: <ISO>
----
-
-# <Name>
-
 One-sentence description in this wiki's scope.
 
 ## Known For
@@ -71,16 +55,7 @@ One-sentence description in this wiki's scope.
 Reference:
 
 ```markdown
----
-title: <Source Title>
-category: references
-source_url: <url-or-path>
-tags: [tag]
-created: <ISO>
-updated: <ISO>
----
-
-# <Source Title>
+One-sentence source description.
 
 ## Key Takeaways
 
@@ -92,16 +67,7 @@ updated: <ISO>
 Synthesis:
 
 ```markdown
----
-title: <Question or Theme>
-category: synthesis
-tags: [tag]
-sources: [source-a, source-b]
-created: <ISO>
-updated: <ISO>
----
-
-# <Question or Theme>
+One-sentence thesis statement.
 
 ## Thesis
 
@@ -112,9 +78,21 @@ updated: <ISO>
 ## What To Investigate Next
 ```
 
+Audit (body content only — no frontmatter, metadata in custom-* attrs):
+
+```markdown
+# Comment
+
+<user feedback>
+
+# Resolution
+
+<!-- filled in when processed -->
+```
+
 ## Metadata mirror
 
-After writing a page, mirror core fields to attributes:
+After writing a page, mirror core fields to attributes (this is the **primary** metadata store; SQL queries and the web viewer rely on these):
 
 ```bash
 siyuan-sisyphus block set_attrs --id "$DOC_ID" --attrs-json '{

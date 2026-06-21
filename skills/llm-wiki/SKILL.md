@@ -29,7 +29,7 @@ description: >
 2. **配置解析**：从 `~/.siyuan-wiki/config` 读取配置。只保存 `SIYUAN_NOTEBOOK_ID`；需要 `fs` 路径时用 `notebook list --json` 按 ID 解析当前名称作为路径首段。
 3. **预检**：首次操作先运行 `siyuan-sisyphus --version`、`siyuan-sisyphus config list`、`siyuan-sisyphus notebook get_permissions --notebook "$SIYUAN_NOTEBOOK_ID"`。
 4. **整页写入**：多行页面用 `fs write --overwrite`；日志追加用 `block append --data-type markdown`；不要用 `block update` 写多行。
-5. **元数据双写**：页面正文保留 YAML frontmatter，同时用 `block set_attrs --attrs-json` 写 `custom-*` 属性。
+5. **元数据单写**：页面正文不包含 YAML frontmatter 和 `# 标题`行（思源自动生成frontmatter和标题）；元数据仅通过 `block set_attrs --attrs-json` 写 `custom-*` 属性。audit 文档也遵循此规则，所有字段通过 custom-* 属性存储。
 6. **SQL 铁律**：`search query_sql` 必须包含 `box='$SIYUAN_NOTEBOOK_ID'`、身份列（`id` 或 `root_id`）和 `LIMIT`。
 7. **图边格式**：页面之间用思源块引用 `((<doc-id> "display text"))`，这样 refs 表、反链和 web 图谱才一致。
 8. **危险动作**：`fs rm`、`fs mv`、`document move`、`block move`、`search find_replace`、`tag remove` 前必须复述影响并取得明确批准。
@@ -61,7 +61,7 @@ synthesis/
 
 ```bash
 siyuan-sisyphus fs write --path "/<resolved name>/<hpath>" \
-  --markdown "<full markdown with YAML frontmatter>" --overwrite
+  --markdown "<content without frontmatter or # heading>" --overwrite
 
 siyuan-sisyphus document lookup --notebook "$SIYUAN_NOTEBOOK_ID" --hpath "/<hpath>" --json
 siyuan-sisyphus block set_attrs --id "<doc-id>" --attrs-json '{"custom-title":"...","custom-category":"concepts","custom-tags":"...","custom-updated":"..."}'

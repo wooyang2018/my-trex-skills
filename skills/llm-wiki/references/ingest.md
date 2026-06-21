@@ -35,5 +35,5 @@ Update an existing page only when the new source adds a new claim, correction, e
 Append one concise entry:
 
 ```bash
-siyuan-sisyphus block append --parent-id "$LOG_DOC_ID" --data-type markdown --data "## [HH:MM] ingest | <source> — touched <n> pages"
+siyuan-sisyphus block append --parent-id "$LOG_DOC_ID" --data-type markdown --data "- YYYY-MM-DD ingest — <source>，touched <n> pages"
 ```

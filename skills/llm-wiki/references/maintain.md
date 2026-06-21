@@ -47,7 +47,7 @@ After explicit approval:
    siyuan-sisyphus search query_sql --sql "SELECT id,hpath,ial FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND type='d' AND hpath LIKE '/audit/%' LIMIT 1000" --json
    ```
 
-4. For each direct child of `/audit/`, read it with `fs read`; archive only if the body frontmatter says `status: resolved` or attrs include `custom-status=resolved`.
+4. For each direct child of `/audit/`, read it with `fs read`; archive only if attrs include `custom-status=resolved`.
 5. For each selected doc, move it with human-readable paths:
 
    ```bash

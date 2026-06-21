@@ -81,16 +81,6 @@ export async function createTestPage(cfg, name) {
   const workspacePath = `/${cfg.workspaceNotebook}/${rel}`;
   const now = new Date().toISOString();
   const markdown = [
-    "---",
-    `title: "${name}"`,
-    'category: "references"',
-    'tags: ["web-e2e", "temporary"]',
-    `created: "${now}"`,
-    `updated: "${now}"`,
-    "---",
-    "",
-    `# ${name}`,
-    "",
     "This temporary page is created by the web end-to-end test.",
     "",
     `The selectable anchor is ${selectionMarker}, and it must survive rendering.`,
@@ -197,12 +187,6 @@ export function execCli(args) {
 
 export function assert(condition, message, getOutput = () => "") {
   if (!condition) throw new Error(`${message}\n\nserver output:\n${getOutput()}`);
-}
-
-export function frontmatterHas(content, key, value) {
-  const quoted = `${key}: ${JSON.stringify(value)}`;
-  const plain = `${key}: ${value}`;
-  return content.includes(quoted) || content.includes(plain);
 }
 
 function sqlEscape(value) {

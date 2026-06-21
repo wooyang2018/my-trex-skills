@@ -7,7 +7,6 @@ import {
   cliJson,
   createTestPage,
   fetchJson,
-  frontmatterHas,
   lookupDocId,
   patchJson,
   postJson,
@@ -75,29 +74,29 @@ try {
   const docId = rows[0]?.id;
   assert(docId, `created audit document not found at ${hpath}`, server.output);
 
+  // Verify body content has no frontmatter, has Comment and Resolution
   const read = await cliJson(["fs", "read", "--path", auditWorkspacePath, "--page-size", "8000", "--json"]);
   assert(typeof read.content === "string", "audit fs read did not return content", server.output);
-  assert(frontmatterHas(read.content, "id", created.id), "audit markdown missing id frontmatter", server.output);
-  assert(frontmatterHas(read.content, "target", testPage.page), "audit markdown missing target frontmatter", server.output);
-  assert(read.content.includes("target_lines: ["), "audit markdown missing target_lines", server.output);
-  assert(frontmatterHas(read.content, "anchor_text", selectionMarker), "audit markdown missing anchor_text", server.output);
-  assert(read.content.includes("anchor_before:"), "audit markdown missing anchor_before", server.output);
-  assert(read.content.includes("anchor_after:"), "audit markdown missing anchor_after", server.output);
-  assert(frontmatterHas(read.content, "severity", "warn"), "audit markdown missing severity", server.output);
-  assert(frontmatterHas(read.content, "author", "e2e"), "audit markdown missing author", server.output);
-  assert(frontmatterHas(read.content, "source", "web-viewer"), "audit markdown missing source", server.output);
-  assert(frontmatterHas(read.content, "status", "open"), "audit markdown missing status", server.output);
   assert(read.content.includes("# Comment"), "audit markdown missing # Comment", server.output);
   assert(read.content.includes(marker), "audit markdown missing submitted comment", server.output);
   assert(read.content.includes("# Resolution"), "audit markdown missing # Resolution", server.output);
 
+  // Verify all metadata is in custom-* attrs (no body frontmatter)
   const attrs = await cliJson(["block", "get_attrs", "--id", docId, "--json"]);
+  assert(attrs["custom-id"] === created.id, "custom-id attr mismatch", server.output);
+  assert(attrs["custom-target"] === testPage.page, "custom-target attr mismatch", server.output);
   assert(attrs["custom-category"] === "audit", "custom-category attr mismatch", server.output);
   assert(attrs["custom-status"] === "open", "custom-status attr mismatch", server.output);
-  assert(attrs["custom-target"] === testPage.page, "custom-target attr mismatch", server.output);
   assert(attrs["custom-title"] === created.id, "custom-title attr mismatch", server.output);
+  assert(attrs["custom-severity"] === "warn", "custom-severity attr mismatch", server.output);
+  assert(attrs["custom-author"] === "e2e", "custom-author attr mismatch", server.output);
+  assert(attrs["custom-source"] === "web-viewer", "custom-source attr mismatch", server.output);
   assert(String(attrs["custom-tags"] ?? "").includes("warn"), "custom-tags missing severity", server.output);
   assert(String(attrs["custom-summary"] ?? "").includes(marker), "custom-summary missing comment", server.output);
+  assert(typeof attrs["custom-anchor-text"] === "string" && attrs["custom-anchor-text"].length > 0, "custom-anchor-text missing", server.output);
+  assert(typeof attrs["custom-anchor-before"] === "string", "custom-anchor-before missing", server.output);
+  assert(typeof attrs["custom-anchor-after"] === "string", "custom-anchor-after missing", server.output);
+  assert(typeof attrs["custom-target-lines"] === "string", "custom-target-lines missing", server.output);
 
   await patchJson(`${base}/api/audit/${created.id}/resolve`, { resolution: "e2e resolved" }, server.output);
   const resolvedAttrs = await cliJson(["block", "get_attrs", "--id", docId, "--json"]);
