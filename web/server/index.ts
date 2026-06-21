@@ -30,7 +30,7 @@ app.get("/api/config", (_req, res) => {
     author: cfg.author,
     mode: cfg.mode,
     notebookId: cfg.notebookId,
-    notebookName: cfg.notebookName,
+    workspaceNotebook: cfg.workspaceNotebook,
     profile: cfg.profile ?? null,
   });
 });
@@ -58,7 +58,7 @@ app.get("/", (_req, res) => {
 app.listen(cfg.port, cfg.host, () => {
   console.log(`llm-wiki web server listening on http://${cfg.host}:${cfg.port}`);
   console.log(`  mode:      ${cfg.mode}`);
-  console.log(`  notebook:  ${cfg.notebookName} (${cfg.notebookId})`);
+  console.log(`  notebook:  ${cfg.notebookId} (${cfg.workspaceNotebook})`);
   if (cfg.profile) console.log(`  profile:   ${cfg.profile}`);
   console.log(`  author:    ${cfg.author}`);
 });

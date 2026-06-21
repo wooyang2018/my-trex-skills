@@ -143,3 +143,4 @@ config.json
 .claude
 .plugins-cache.json
 .vscode
+.codebuddy

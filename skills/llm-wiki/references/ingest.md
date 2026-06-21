@@ -17,8 +17,8 @@ Use this when adding new material to the wiki.
 
 - Files and directories: read from the user-provided path, then distill into the SiYuan wiki.
 - URLs: fetch/extract the article text, then store a reference page with `source_url`.
-- Conversations: write durable ideas to `journal/` or relevant category pages, not raw transcript dumps.
-- Drafts in `_raw/`: read through `fs read --path "/$SIYUAN_NOTEBOOK_NAME/_raw/<doc>"`, promote useful material, then ask before deleting the draft.
+- Conversations: write durable ideas to `synthesis/` or relevant category pages, not raw transcript dumps.
+- Drafts in `_raw/`: resolve the notebook name from `SIYUAN_NOTEBOOK_ID`, then read through `fs read --path "/<resolved-name>/_raw/<doc>"`, promote useful material, then ask before deleting the draft.
 
 ## Page planning
 

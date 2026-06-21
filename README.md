@@ -96,8 +96,7 @@ Claude Code 会读取 `.claude-plugin/marketplace.json`，加载同名插件。
 ### Wiki 快速开始
 
 1. 确保思源笔记运行且 `siyuan-sisyphus` 已配置
-2. 复制 `.env.example` 为 `.env`，设置 `SIYUAN_NOTEBOOK_ID` 和 `SIYUAN_NOTEBOOK_NAME`
-3. 在 Agent 中说 **"set up my wiki"** — `wiki-setup` 技能会自动初始化笔记本结构
+2. 在 Agent 中说 **"set up my wiki"** — `wiki-setup` 技能会自动创建 `~/.siyuan-wiki/config` 并初始化笔记本结构
 
 ---
 
@@ -109,7 +108,7 @@ my-trex-skills/
 │   └── marketplace.json         # Claude Code 市场清单
 ├── .codebuddy-plugin/
 │   └── marketplace.json         # CodeBuddy 市场清单
-├── .env.example                 # Wiki 配置模板
+
 ├── AGENTS.md                    # AI Agent 协作守则（含存储宪法）
 ├── README.md                    # 本文件
 └── skills/

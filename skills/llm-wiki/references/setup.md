@@ -10,16 +10,35 @@ siyuan-sisyphus config list
 siyuan-sisyphus notebook list --json
 ```
 
-Resolve configuration in this order:
+## Configuration
 
-1. Walk upward from CWD looking for `.env`.
-2. Fall back to `~/.siyuan-wiki/config`.
-3. If neither exists, ask the user which notebook should hold the wiki.
+Resolve configuration from a single source:
 
-Required values:
+1. Read `~/.siyuan-wiki/config` — this is the sole configuration file.
+2. If it does not exist, ask the user for the notebook id from `notebook list --json`, then create it by writing the
+   template below to `~/.siyuan-wiki/config`.
 
-- `SIYUAN_NOTEBOOK_ID` for `--notebook`, `document lookup`, and `search query_sql ... box=`.
-- `SIYUAN_NOTEBOOK_NAME` for `fs` workspace paths such as `/知识库/index`.
+### Required fields (user must provide)
+
+- `SIYUAN_NOTEBOOK_ID` — immutable notebook id like `20241205084226-rl6jd3a`.
+  Used for `--notebook`, `document lookup`, and `search query_sql ... box=`.
+  Discover via `siyuan-sisyphus notebook list --json`.
+For `fs` commands, resolve the current notebook name at runtime with
+`siyuan-sisyphus notebook list --json` and use `/<resolved-name>/<hpath>`.
+Do not persist a second notebook identity in config.
+
+### Config template (write this file when creating from scratch)
+
+When `~/.siyuan-wiki/config` does not exist, generate it with these contents
+(filling in the required fields from user input):
+
+```toml
+# siyuan-wiki — Global Configuration (single source of truth)
+SIYUAN_NOTEBOOK_ID="<fill-from-notebook-list>"
+
+# Optional: override the active siyuan-sisyphus profile.
+SIYUAN_PROFILE=
+```
 
 ## Structure
 
@@ -32,17 +51,12 @@ index
 log
 hot
 audit
-audit/resolved
 _meta
 _meta/manifest
-_meta/taxonomy
 concepts
 entities
-skills
 references
 synthesis
-journal
-projects
 ```
 
 Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`, `_meta/manifest`) only when intentionally refreshing them.
@@ -53,10 +67,11 @@ After setup, the web viewer should be started with the same notebook identity:
 
 ```bash
 cd web
-npm start -- --notebook-id "$SIYUAN_NOTEBOOK_ID" --notebook-name "$SIYUAN_NOTEBOOK_NAME"
+npm start
 ```
 
-Add `--profile <name>` only when the user has selected a non-default `siyuan-sisyphus` profile.
+`web` reads `SIYUAN_NOTEBOOK_ID` and `SIYUAN_PROFILE` from `~/.siyuan-wiki/config`.
+Pass `--notebook-id <id>` or `--profile <name>` only to override the global config for one run.
 
 ## Verification
 

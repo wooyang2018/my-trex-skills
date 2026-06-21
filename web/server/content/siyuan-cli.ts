@@ -57,6 +57,15 @@ export class SiyuanCli {
       throw new SiyuanCliError("siyuan-sisyphus did not return JSON", args, stdout, "");
     }
   }
+
+  async dataArray<T>(args: string[]): Promise<T[]> {
+    const value = await this.json<unknown>(args);
+    if (Array.isArray(value)) return value as T[];
+    if (value && typeof value === "object" && Array.isArray((value as { data?: unknown }).data)) {
+      return (value as { data: T[] }).data;
+    }
+    throw new SiyuanCliError("siyuan-sisyphus JSON response did not contain an array", args, JSON.stringify(value), "");
+  }
 }
 
 function sliceJson(text: string): string | null {
@@ -93,7 +102,7 @@ export function normalizeRelPath(input: string): string {
     .replace(/\/$/, "");
 }
 
-export function workspacePath(notebookName: string, relPath: string): string {
+export function workspacePath(workspaceNotebook: string, relPath: string): string {
   const rel = normalizeRelPath(relPath);
-  return rel ? `/${notebookName}/${rel}` : `/${notebookName}`;
+  return rel ? `/${workspaceNotebook}/${rel}` : `/${workspaceNotebook}`;
 }

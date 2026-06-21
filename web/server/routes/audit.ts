@@ -39,14 +39,14 @@ export function handleAuditList(cfg: ServerConfig) {
         if (rel === "audit" || rel === "audit/resolved") continue;
         if (!matchesMode(rel, mode)) continue;
         try {
-          const text = await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, rel), "--page-size", "8000"]);
+          const text = await readMarkdown(cli, cfg, rel);
           const entry = fromMarkdown(text);
           if (target && normalizeTarget(entry.target) !== normalizeTarget(target)) continue;
           if (mode === "open" && entry.status !== "open") continue;
           if (mode === "resolved" && entry.status !== "resolved") continue;
           entries.push(entry);
         } catch (err) {
-          console.warn(`skipping malformed audit ${doc.hpath}: ${String(err)}`);
+          // SiYuan's SQL index can briefly return deleted documents; skip them.
         }
       }
 
@@ -102,7 +102,7 @@ export function handleAuditCreate(cfg: ServerConfig) {
         return;
       }
 
-      await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, target), "--page-size", "1"]);
+      await cli.run(["fs", "read", "--path", workspacePath(cfg.workspaceNotebook, target), "--page-size", "1"]);
       await ensureAuditRoots(cli, cfg);
 
       const anchor = computeAnchor(rawMarkdown, selStart, selEnd);
@@ -129,7 +129,7 @@ export function handleAuditCreate(cfg: ServerConfig) {
         "fs",
         "write",
         "--path",
-        workspacePath(cfg.notebookName, relPath),
+        workspacePath(cfg.workspaceNotebook, relPath),
         "--markdown",
         toMarkdown(entry),
         "--overwrite",
@@ -162,7 +162,7 @@ export function handleAuditResolve(cfg: ServerConfig) {
       }
 
       const rel = normalizeRelPath(doc.hpath);
-      const text = await cli.run(["fs", "read", "--path", workspacePath(cfg.notebookName, rel), "--page-size", "8000"]);
+      const text = await readMarkdown(cli, cfg, rel);
       const entry = fromMarkdown(text);
       const today = new Date().toISOString().slice(0, 10);
       const newBody = replaceResolution(
@@ -175,7 +175,7 @@ export function handleAuditResolve(cfg: ServerConfig) {
         "fs",
         "write",
         "--path",
-        workspacePath(cfg.notebookName, rel),
+        workspacePath(cfg.workspaceNotebook, rel),
         "--markdown",
         toMarkdown(resolvedEntry),
         "--overwrite",
@@ -194,13 +194,29 @@ function makeCli(cfg: ServerConfig): SiyuanCli {
 }
 
 async function listAuditDocs(cli: SiyuanCli, cfg: ServerConfig): Promise<AuditDocRow[]> {
-  return cli.json<AuditDocRow[]>([
+  return cli.dataArray<AuditDocRow>([
     "search",
     "query_sql",
     "--sql",
     `SELECT id, hpath, name, updated FROM blocks WHERE box=${sqlString(cfg.notebookId)} AND type='d' AND hpath LIKE '/audit/%' ORDER BY updated DESC LIMIT 1000`,
     "--json",
   ]);
+}
+
+async function readMarkdown(cli: SiyuanCli, cfg: ServerConfig, rel: string): Promise<string> {
+  const result = await cli.json<{ content?: string }>([
+    "fs",
+    "read",
+    "--path",
+    workspacePath(cfg.workspaceNotebook, rel),
+    "--page-size",
+    "8000",
+    "--json",
+  ]);
+  if (typeof result.content !== "string") {
+    throw new Error(`fs read did not return content for ${rel}`);
+  }
+  return result.content;
 }
 
 function matchesMode(rel: string, mode: string): boolean {
@@ -211,7 +227,6 @@ function matchesMode(rel: string, mode: string): boolean {
 
 async function ensureAuditRoots(cli: SiyuanCli, cfg: ServerConfig): Promise<void> {
   await ensureDoc(cli, cfg, "audit", "# Audit\n");
-  await ensureDoc(cli, cfg, "audit/resolved", "# Resolved Audits\n");
 }
 
 async function ensureDoc(cli: SiyuanCli, cfg: ServerConfig, rel: string, markdown: string): Promise<void> {
@@ -219,7 +234,7 @@ async function ensureDoc(cli: SiyuanCli, cfg: ServerConfig, rel: string, markdow
     await lookupDocId(cli, cfg, rel);
     return;
   } catch {
-    await cli.run(["fs", "write", "--path", workspacePath(cfg.notebookName, rel), "--markdown", markdown]);
+    await cli.run(["fs", "write", "--path", workspacePath(cfg.workspaceNotebook, rel), "--markdown", markdown]);
   }
 }
 
@@ -250,35 +265,16 @@ async function writeAuditAttrs(
 }
 
 async function lookupDocId(cli: SiyuanCli, cfg: ServerConfig, rel: string): Promise<string> {
-  const result = await cli.json<unknown>([
-    "document",
-    "lookup",
-    "--notebook",
-    cfg.notebookId,
-    "--hpath",
-    `/${normalizeRelPath(rel)}`,
-    "--include",
-    '["id","hpath"]',
+  const rows = await cli.dataArray<{ id: string }>([
+    "search",
+    "query_sql",
+    "--sql",
+    `SELECT id FROM blocks WHERE box=${sqlString(cfg.notebookId)} AND type='d' AND hpath=${sqlString(`/${normalizeRelPath(rel)}`)} LIMIT 1`,
     "--json",
   ]);
-  const id = extractId(result);
+  const id = rows[0]?.id;
   if (!id) throw new Error(`document lookup did not return id for ${rel}`);
   return id;
-}
-
-function extractId(value: unknown): string | null {
-  if (value && typeof value === "object") {
-    const maybe = value as { id?: unknown; data?: unknown };
-    if (typeof maybe.id === "string") return maybe.id;
-    if (maybe.data) return extractId(maybe.data);
-  }
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const id = extractId(item);
-      if (id) return id;
-    }
-  }
-  return null;
 }
 
 function normalizeTarget(target: string): string {

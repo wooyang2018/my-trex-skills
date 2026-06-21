@@ -19,14 +19,14 @@ description: >
 | 摄取文件、URL、对话、草稿、研究材料 | `ingest` | `references/ingest.md` + `references/writing.md` |
 | “我知道 X 吗？”、“基于 wiki 回答” | `query` | `references/query.md` |
 | 处理 web 里提交的反馈 | `audit` | `references/audit.md` |
-| 周报、仪表板、上下文包、维护检查 | `report` / `maintain` | `references/report.md` / `references/maintain.md` |
+| 维护检查、归档已解决审计 | `maintain` | `references/maintain.md` |
 
 只加载当前操作需要的 reference；不要一次性读完整个目录。
 
 ## 硬规则
 
 1. **唯一访问层**：所有思源读写使用 `siyuan-sisyphus`。不要直接访问思源工作区文件，不要自写思源请求。
-2. **配置解析**：从 CWD 向上找 `.env`，再读 `~/.siyuan-wiki/config`。必须得到 `SIYUAN_NOTEBOOK_ID` 和 `SIYUAN_NOTEBOOK_NAME`，二者不可互相推导。
+2. **配置解析**：从 `~/.siyuan-wiki/config` 读取配置。只保存 `SIYUAN_NOTEBOOK_ID`；需要 `fs` 路径时用 `notebook list --json` 按 ID 解析当前名称作为路径首段。
 3. **预检**：首次操作先运行 `siyuan-sisyphus --version`、`siyuan-sisyphus config list`、`siyuan-sisyphus notebook get_permissions --notebook "$SIYUAN_NOTEBOOK_ID"`。
 4. **整页写入**：多行页面用 `fs write --overwrite`；日志追加用 `block append --data-type markdown`；不要用 `block update` 写多行。
 5. **元数据双写**：页面正文保留 YAML frontmatter，同时用 `block set_attrs --attrs-json` 写 `custom-*` 属性。
@@ -43,32 +43,24 @@ index
 log
 hot
 audit/
-audit/resolved/
 _meta/manifest
-_meta/taxonomy
 concepts/
 entities/
-skills/
 references/
 synthesis/
-journal/
-projects/
 ```
 
 页面类别：
 
 - `concepts/`：概念、模式、心智模型。
 - `entities/`：人物、工具、组织、论文、项目。
-- `skills/`：操作知识和流程。
 - `references/`：单一来源摘要、规范、API、配置。
 - `synthesis/`：跨来源综合。
-- `journal/`：时间条目和会话记录。
-- `projects/`：项目专属知识。
 
 ## 标准写入模式
 
 ```bash
-siyuan-sisyphus fs write --path "/$SIYUAN_NOTEBOOK_NAME/<hpath>" \
+siyuan-sisyphus fs write --path "/<resolved name>/<hpath>" \
   --markdown "<full markdown with YAML frontmatter>" --overwrite
 
 siyuan-sisyphus document lookup --notebook "$SIYUAN_NOTEBOOK_ID" --hpath "/<hpath>" --json

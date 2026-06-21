@@ -80,9 +80,8 @@ siyuan-sisyphus notebook list
 
 所有 wiki 技能使用统一配置解析：
 
-1. **从 CWD 向上查找** — 在当前目录及父目录中查找 `.env` 文件（含 `SIYUAN_NOTEBOOK_ID`），直到 `$HOME`。
-2. **全局配置** — 若无本地 `.env`，读取 `~/.siyuan-wiki/config`。
-3. **提示初始化** — 若均不存在，提示用户运行 `wiki-setup`。
+1. **读取全局配置** — 从 `~/.siyuan-wiki/config` 读取所有配置项。这是唯一的配置来源。
+2. **提示初始化** — 若配置不存在，提示用户运行 `wiki-setup`。
 
 配置提供两个笔记本变量（均为必需，不可互相推导）：
 

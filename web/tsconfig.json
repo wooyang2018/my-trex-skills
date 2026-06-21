@@ -4,6 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,6 +14,6 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["server/**/*.ts", "client/**/*.ts", "shared/**/*.ts", "build-client.mjs"],
+  "include": ["server/**/*.ts", "client/**/*.ts", "client/**/*.tsx", "shared/**/*.ts", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

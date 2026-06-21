@@ -5,10 +5,12 @@
   "type": "module",
   "description": "SiYuan CLI-backed wiki reader and audit feedback server for the llm-wiki skill.",
   "scripts": {
-    "build": "node build-client.mjs",
+    "build": "vite build",
     "prestart": "npm run build",
     "start": "tsx server/index.ts",
-    "dev": "tsx watch server/index.ts"
+    "dev": "tsx watch server/index.ts",
+    "test:e2e": "node test/e2e-smoke.mjs",
+    "test:e2e:audit": "node test/e2e-audit-write.mjs"
   },
   "dependencies": {
     "d3-drag": "^3.0.0",
@@ -18,11 +20,14 @@
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",
     "katex": "^0.16.10",
+    "lucide-react": "^1.21.0",
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.0.1",
     "markdown-it-attrs": "^4.2.0",
     "markdown-it-texmath": "^1.0.0",
     "mermaid": "^10.9.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -34,8 +39,11 @@
     "@types/js-yaml": "^4.0.9",
     "@types/markdown-it": "^14.1.1",
     "@types/node": "^20.11.0",
-    "esbuild": "^0.20.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vite": "^5.4.21"
   }
 }

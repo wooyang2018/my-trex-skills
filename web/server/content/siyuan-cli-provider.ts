@@ -18,7 +18,7 @@ import {
 
 interface ProviderOptions {
   notebookId: string;
-  notebookName: string;
+  workspaceNotebook: string;
   profile?: string;
   timeoutMs: number;
   cacheTtlMs: number;
@@ -63,7 +63,15 @@ export class SiyuanCliContentProvider implements ContentProvider {
 
   async getTree(): Promise<ContentTreeNode> {
     const docs = await this.ensureDocs();
-    const root: ContentTreeNode = { name: this.opts.notebookName, path: "wiki", kind: "dir", children: [] };
+    const root: ContentTreeNode = { name: this.opts.workspaceNotebook, path: "wiki", kind: "dir", children: [] };
+    const ancestorDocs = new Set<string>();
+    for (const doc of docs) {
+      const rel = hpathToRel(doc.hpath);
+      const parts = rel.split("/");
+      for (let i = 1; i < parts.length; i++) {
+        ancestorDocs.add(parts.slice(0, i).join("/"));
+      }
+    }
 
     for (const doc of docs) {
       const rel = hpathToRel(doc.hpath);
@@ -84,6 +92,7 @@ export class SiyuanCliContentProvider implements ContentProvider {
         current = child;
       }
 
+      if (ancestorDocs.has(rel)) continue;
       current.children = current.children ?? [];
       current.children.push({
         name: parts[parts.length - 1]!,
@@ -190,15 +199,19 @@ export class SiyuanCliContentProvider implements ContentProvider {
   }
 
   private async readRel(rel: string): Promise<string> {
-    const out = await this.cli.run([
+    const out = await this.cli.json<{ content?: string }>([
       "fs",
       "read",
       "--path",
-      workspacePath(this.opts.notebookName, rel),
+      workspacePath(this.opts.workspaceNotebook, rel),
       "--page-size",
       "8000",
+      "--json",
     ]);
-    return out;
+    if (typeof out.content !== "string") {
+      throw new Error(`fs read did not return content for ${rel}`);
+    }
+    return out.content;
   }
 
   private async ensureDocs(): Promise<SiYuanDoc[]> {
@@ -246,7 +259,7 @@ export class SiyuanCliContentProvider implements ContentProvider {
   }
 
   private sql<T>(sql: string): Promise<T[]> {
-    return this.cli.json<T[]>(["search", "query_sql", "--sql", sql, "--json"]);
+    return this.cli.dataArray<T>(["search", "query_sql", "--sql", sql, "--json"]);
   }
 }
 
