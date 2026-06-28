@@ -3,7 +3,7 @@ name: llm-wiki
 description: >
   在思源笔记本中构建和维护 Karpathy 风格 LLM Wiki。只通过 siyuan-sisyphus
   CLI 访问思源；不支持其他笔记系统、本地 Markdown 仓库或绕过 CLI 的思源访问。
-  当用户要初始化 wiki、摄取来源、基于 wiki 回答问题、处理 web 反馈审计、
+  当用户要初始化 wiki、摄取来源、基于 wiki 回答问题、处理审计反馈、
   生成报告或维护知识图谱时使用。
 ---
 
@@ -18,7 +18,7 @@ description: >
 | 初始化、切换、检查笔记本结构 | `setup` | `references/setup.md` |
 | 摄取文件、URL、对话、草稿、研究材料 | `ingest` | `references/ingest.md` + `references/writing.md` |
 | “我知道 X 吗？”、“基于 wiki 回答” | `query` | `references/query.md` |
-| 处理 web 里提交的反馈 | `audit` | `references/audit.md` |
+| 处理审计反馈 | `audit` | `references/audit.md` |
 | 维护检查、归档已解决审计 | `maintain` | `references/maintain.md` |
 
 只加载当前操作需要的 reference；不要一次性读完整个目录。
@@ -31,7 +31,7 @@ description: >
 4. **整页写入**：多行页面用 `fs write --overwrite`；日志追加用 `block append --data-type markdown`；不要用 `block update` 写多行。
 5. **元数据单写**：页面正文不包含 YAML frontmatter 和 `# 标题`行（思源自动生成frontmatter和标题）；元数据仅通过 `block set_attrs --attrs-json` 写 `custom-*` 属性。audit 文档也遵循此规则，所有字段通过 custom-* 属性存储。
 6. **SQL 铁律**：`search query_sql` 必须包含 `box='$SIYUAN_NOTEBOOK_ID'`、身份列（`id` 或 `root_id`）和 `LIMIT`。
-7. **图边格式**：页面之间用思源块引用 `((<doc-id> "display text"))`，这样 refs 表、反链和 web 图谱才一致。
+7. **图边格式**：页面之间用思源块引用 `((<doc-id> "display text"))`，这样 refs 表和反链才一致。
 8. **危险动作**：`fs rm`、`fs mv`、`document move`、`block move`、`search find_replace`、`tag remove` 前必须复述影响并取得明确批准。
 
 ## 存储约定

@@ -61,18 +61,6 @@ synthesis
 
 Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`, `_meta/manifest`) only when intentionally refreshing them.
 
-## Web command
-
-After setup, the web viewer should be started with the same notebook identity:
-
-```bash
-cd web
-npm start
-```
-
-`web` reads `SIYUAN_NOTEBOOK_ID` and `SIYUAN_PROFILE` from `~/.siyuan-wiki/config`.
-Pass `--notebook-id <id>` or `--profile <name>` only to override the global config for one run.
-
 ## Verification
 
 - `notebook get_permissions --notebook "$SIYUAN_NOTEBOOK_ID"` returns write permission for write operations.

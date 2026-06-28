@@ -92,7 +92,7 @@ Audit (body content only — no frontmatter, metadata in custom-* attrs):
 
 ## Metadata mirror
 
-After writing a page, mirror core fields to attributes (this is the **primary** metadata store; SQL queries and the web viewer rely on these):
+After writing a page, mirror core fields to attributes (this is the **primary** metadata store; SQL queries rely on these):
 
 ```bash
 siyuan-sisyphus block set_attrs --id "$DOC_ID" --attrs-json '{

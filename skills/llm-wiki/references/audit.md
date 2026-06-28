@@ -1,10 +1,10 @@
 # Audit
 
-Use this when processing feedback submitted from the web viewer.
+Use this when processing audit feedback.
 
 ## Audit document shape
 
-The web viewer writes audit documents under `audit/`. Each document has YAML frontmatter and mirrored `custom-*` attributes:
+Audit documents live under `audit/`. Each document has YAML frontmatter and mirrored `custom-*` attributes:
 
 ```yaml
 id: 20260620-120102-a1b2
@@ -15,7 +15,7 @@ anchor_text: "selected text"
 anchor_after: "..."
 severity: warn
 author: user
-source: web-viewer
+source: manual
 created: 2026-06-20T12:01:02.000Z
 status: open
 ```
