@@ -1,0 +1,9 @@
+{
+  "name": "frontend-dev",
+  "version": "1.3.1",
+  "description": "前端开发技能集：React/Next.js 性能优化、React Native、页面动画、Playwright 调试、shadcn/ui 组件用法、前端视觉设计（摆脱 AI 千篇一律的审美，含 73 套品牌设计范本）。",
+  "author": {
+    "name": "okarinhuang"
+  },
+  "keywords": ["react", "nextjs", "react-native", "frontend", "performance", "animations", "ui", "shadcn", "design", "aesthetics"]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "my-trex-skills",
+  "interface": {
+    "displayName": "my-trex-skills Plugins"
+  },
+  "plugins": [
+    {
+      "name": "go-dev",
+      "source": {
+        "source": "local",
+        "path": "./plugins/go-dev"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "project-craft",
+      "source": {
+        "source": "local",
+        "path": "./plugins/project-craft"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "spec-craft",
+      "source": {
+        "source": "local",
+        "path": "./plugins/spec-craft"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

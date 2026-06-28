@@ -1,0 +1,15 @@
+{
+  "name": "go-dev",
+  "version": "2.0.0",
+  "description": "Go 全栈开发技能集：惯用模式、并发、错误处理、测试、性能优化、数据库、gRPC、GraphQL、CLI（Cobra/Viper）、设计模式、依赖注入（Wire/Dig/Fx）、可观测性、安全、CI/CD、Lint、文档、以及 samber 生态库（lo/mo/do/oops/slog/hot/ro）。",
+  "author": {
+    "name": "okarinhuang"
+  },
+  "keywords": [
+    "go", "golang", "cobra", "viper", "cli", "idiomatic-go", "spec-review",
+    "concurrency", "error-handling", "testing", "performance", "grpc", "graphql",
+    "database", "design-patterns", "dependency-injection", "wire", "dig", "fx",
+    "observability", "security", "lint", "ci-cd", "swagger", "samber",
+    "data-structures", "context", "benchmarks", "documentation"
+  ]
+}

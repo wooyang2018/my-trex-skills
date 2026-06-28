@@ -1,0 +1,24 @@
+{
+  "name": "project-craft",
+  "version": "1.0.0",
+  "description": "Project lifecycle skills for initialization, repository standards, changelogs, documentation, and semantic versioning.",
+  "author": {
+    "name": "agent-plugins",
+    "url": "https://git.woa.com/okarinhuang/agent-plugins"
+  },
+  "homepage": "https://git.woa.com/okarinhuang/agent-plugins",
+  "repository": "https://git.woa.com/okarinhuang/agent-plugins",
+  "license": "MIT",
+  "keywords": ["project-init", "gitignore", "license", "changelog", "semver", "readme"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Craft",
+    "shortDescription": "Initialize and maintain healthy repositories",
+    "longDescription": "Use Project Craft to initialize standard repository files and maintain Conventional Commits, changelogs, README documentation, and semantic versions throughout a project's lifecycle.",
+    "developerName": "agent-plugins",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://git.woa.com/okarinhuang/agent-plugins",
+    "defaultPrompt": ["Initialize this repository with the standard project files it needs."]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "go-dev",
+  "version": "2.0.0",
+  "description": "Go development skills covering idiomatic code, concurrency, testing, performance, databases, APIs, CLI architecture, dependency injection, observability, security, and spec review.",
+  "author": {
+    "name": "okarinhuang",
+    "url": "https://git.woa.com/okarinhuang"
+  },
+  "homepage": "https://git.woa.com/okarinhuang/agent-plugins",
+  "repository": "https://git.woa.com/okarinhuang/agent-plugins",
+  "license": "MIT",
+  "keywords": ["go", "golang", "cobra", "viper", "testing", "performance", "security"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Go Dev",
+    "shortDescription": "Build and review production Go software",
+    "longDescription": "Use Go Dev for idiomatic Go implementation and review across concurrency, testing, performance, databases, APIs, CLI architecture, dependency injection, observability, security, and technical specifications.",
+    "developerName": "okarinhuang",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://git.woa.com/okarinhuang/agent-plugins",
+    "defaultPrompt": ["Review this Go project and suggest the highest-impact improvements."]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "spec-craft",
+  "version": "1.1.0",
+  "description": "Conversation-first workflows for turning ideas into approved implementation specs and writing clear Chinese prose.",
+  "author": {
+    "name": "agent-plugins",
+    "url": "https://git.woa.com/okarinhuang/agent-plugins"
+  },
+  "homepage": "https://git.woa.com/okarinhuang/agent-plugins",
+  "repository": "https://git.woa.com/okarinhuang/agent-plugins",
+  "license": "MIT",
+  "keywords": ["brainstorming", "spec", "requirements", "design", "chinese-writing"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Spec Craft",
+    "shortDescription": "Turn ideas into clear, approved specifications",
+    "longDescription": "Use Spec Craft to clarify intent one question at a time, compare approaches, write and review implementation specifications, and produce clear Chinese prose.",
+    "developerName": "agent-plugins",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://git.woa.com/okarinhuang/agent-plugins",
+    "defaultPrompt": ["Help me turn this idea into an implementation-ready specification."]
+  }
+}

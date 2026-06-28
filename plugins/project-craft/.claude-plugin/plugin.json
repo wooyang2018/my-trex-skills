@@ -1,0 +1,9 @@
+{
+  "name": "project-craft",
+  "version": "1.0.0",
+  "description": "项目全生命周期工具集：新项目初始化（.gitignore、.editorconfig、LICENSE、.env.example）与持续工作流规范（Conventional Commits、Keep a Changelog、README 同步、语义化版本）。",
+  "author": {
+    "name": "agent-plugins"
+  },
+  "keywords": ["init", "gitignore", "editorconfig", "license", "env", "conventional-commits", "changelog", "semver", "readme"]
+}

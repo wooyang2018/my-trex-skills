@@ -1,0 +1,12 @@
+Frontend Design skill
+
+© Anthropic PBC. All rights reserved.
+Use is subject to Anthropic's Commercial Terms of Service:
+https://www.anthropic.com/legal/commercial-terms
+
+Authors: Prithvi Rajasekaran (prithvi@anthropic.com), Alexander Bricken (alexander@anthropic.com)
+Source: https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design
+
+This skill is a static copy of Anthropic's official `frontend-design` plugin,
+vendored into the `frontend-dev` plugin of this marketplace. It is governed by
+the Anthropic Commercial Terms above, NOT by this repository's MIT license.

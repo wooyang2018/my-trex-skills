@@ -1,0 +1,9 @@
+{
+  "name": "specialist-agents",
+  "version": "1.2.0",
+  "description": "按专长召唤外部 CLI agent（pi / codebuddy / codex），把检索、概要、机械代码生成、文案体力活、并发脏活与高难复核分出去，避开 haiku/sonnet 的低性价比工时。",
+  "author": {
+    "name": "agent-plugins"
+  },
+  "keywords": ["delegate", "cli-agent", "pi", "codebuddy", "codex", "deepseek", "glm", "gemini", "cost-saving", "concurrency"]
+}

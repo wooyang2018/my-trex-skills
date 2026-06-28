@@ -1,0 +1,9 @@
+{
+  "name": "spec-craft",
+  "version": "1.1.0",
+  "description": "体验优先的『想法 → spec』工作流：通过一次一问的协作式对话，把创意打磨成可落地的设计规格，并提供清晰中文写作指导。",
+  "author": {
+    "name": "agent-plugins"
+  },
+  "keywords": ["brainstorming", "spec", "design", "requirements", "ideation", "chinese-writing"]
+}
