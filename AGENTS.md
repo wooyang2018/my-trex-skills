@@ -113,9 +113,6 @@ $SIYUAN_NOTEBOOK_NAME (notebook root)
 ├── index                   # 主索引 — 每个页面都列出
 ├── log                     # 时间线活动日志（block append）
 ├── hot                     # 会话热缓存 — ~500 词语义快照
-├── _meta/
-│   ├── manifest            # 导入跟踪账本（JSON in code fence）
-│   └── taxonomy            # 受控标签词汇
 ├── _insights               # 图分析输出
 ├── _staging/               # 暂存审查队列（WIKI_STAGED_WRITES=true 时）
 ├── _archives/              # 归档快照
@@ -124,15 +121,15 @@ $SIYUAN_NOTEBOOK_NAME (notebook root)
 ├── synthesis/              # 跨来源综合分析
 ├── comparisons/            # 多方案对比分析
 ├── contradictions/         # 来源间矛盾记录
-├── journal/                # 时间条目 — 日志、会话笔记
+├── journal/                # 学习反思日志 — 费曼自检、学习复盘
 └── projects/
-    └── <project-name>      # 每个项目一个文档（wiki-update 同步）
+    └── <project-name>      # 学习计划与实践记录 — 目标、进度、关联概念
 ```
 
 ### 三条硬性写入规则
 
 1. **整页重写用 `fs write --overwrite`。** 多行内容绝不使用 `block update`（会在首个换行处静默截断）。
-2. **增量日志追加用 `block append --data-type markdown`。** 首次 `document lookup` 后将父文档 ID 缓存到 `_meta/manifest` 的 `cached_doc_ids` 中。
+2. **增量日志追加用 `block append --data-type markdown`。** 需要文档 ID 时运行时 `document lookup` 解析，不再缓存到 manifest。
 3. **元数据单写。** 文档体不含 YAML frontmatter 和 `# 标题`行（思源自动生成 frontmatter 和标题）；元数据仅通过 `block set_attrs --attrs-json` 写 `custom-*` 属性，为 SQL 索引查询提供唯一来源。
 
 ### 写入模式 — 两步写入法
@@ -146,20 +143,20 @@ siyuan-sisyphus fs write --path "/$SIYUAN_NOTEBOOK_NAME/concepts/my-page" \
 siyuan-sisyphus document lookup --notebook "$SIYUAN_NOTEBOOK_ID" --hpath "/concepts/my-page"
 # → 获取 doc-id
 siyuan-sisyphus block set_attrs --id <doc-id> \
-  --attrs-json '{"custom-title":"My Page","custom-category":"concepts","custom-tags":"a,b","custom-sources":"source-a","custom-summary":"...","custom-status":"draft","custom-confidence":"medium","custom-updated":"2026-06-28"}'
+  --attrs-json '{"custom-title":"My Page","custom-category":"concepts","custom-tags":"a,b","custom-sources":"source-a","custom-summary":"...","custom-status":"draft","custom-confidence":"low","custom-depth":"beginner","custom-updated":"2026-06-28"}'
 ```
 
 ### AI 写入边界
 
-| 类别 | AI 角色 | 默认 status | 默认 confidence |
-|------|---------|-------------|-----------------|
-| `concepts/` | 草拟全文，人工验证后升级 verified | draft | medium |
-| `references/` | 完全写入，可选审查 | verified | high |
-| `synthesis/` | 草拟全文，人工验证后升级 verified | draft | medium |
-| `comparisons/` | 草拟全文，人工验证后升级 verified | draft | medium |
-| `contradictions/` | 检测并提议，人工确认后创建 | draft | low |
+| 类别 | AI 角色 | 初始 status | 初始 confidence | 初始 depth |
+|------|---------|-------------|-----------------|------------|
+| `concepts/` | 草拟全文 + 生成闪卡，status/confidence/depth 自动派生 | draft | low | beginner |
+| `references/` | 完全写入 | verified (恒定) | high (恒定) | — |
+| `synthesis/` | 草拟全文，status/confidence 自动派生 | draft | low | — |
+| `comparisons/` | 草拟全文，status/confidence 自动派生 | draft | low | — |
+| `contradictions/` | 检测并创建，status 由 Resolution Status 决定 | draft | low (恒定) | — |
 
-references/ 因事实性强、错误易对照源发现，由 AI 完全写入。concepts/synthesis/comparisons 涉及抽象和跨源综合，错误隐性，需人工验证。contradictions 需人工判断，避免误报污染知识库。
+`custom-status`、`custom-confidence`、`custom-depth` 三个字段由 maintain 周期自动派生，**不需要人工维护**。confidence 由来源数量决定（0-1→low, 2→medium, 3+→high）；status 由时间+来源+矛盾状态决定；depth 由闪卡复习表现决定（concept 页面包含 L1/L2/L3 三层闪卡，复习表现自动决定 depth）。references/ 因事实性强、错误易对照源发现，由 AI 完全写入。
 
 ### 检索原语 — 分层检索（成本递增）
 
@@ -236,7 +233,7 @@ wiki 页面之间的所有内部链接写为思源原生块引用：
 3. **长文档/列表** — 加 `--page N --page-size 8000` 避免截断
 4. **多行内容写入** — 用 `block append` / `block insert` / `fs write`，不要用 `block update`（会截断）
 5. **Excalidraw 嵌入** — 走 `scripts/excalidraw_compose.py`（Python ≥ 3.8），不要手拼 base64
-6. **wiki 页面必须有 custom 属性** — `custom-title`、`custom-category`、`custom-tags`、`custom-sources`、`custom-summary`、`custom-status`（draft|verified|outdated）、`custom-confidence`（low|medium|high）、`custom-updated`，共 8 个字段，通过 `block set_attrs --attrs-json` 写入（不写 YAML frontmatter）
+6. **wiki 页面必须有 custom 属性** — `custom-title`、`custom-category`、`custom-tags`、`custom-sources`、`custom-summary`、`custom-status`（draft|verified|outdated，**自动派生**）、`custom-confidence`（low|medium|high，**自动派生**）、`custom-depth`（beginner|intermediate|advanced，仅 concepts/，**闪卡自动派生**）、`custom-updated`，共 9 个字段（其中 3 个自动派生），通过 `block set_attrs --attrs-json` 写入（不写 YAML frontmatter）
 7. **知识图谱边用块引用** — `((doc-id "display text"))`，不用 `[[wikilink]]`
 
 ---

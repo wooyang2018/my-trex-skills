@@ -41,8 +41,8 @@ After generating a durable answer, **default to writing back** to the wiki. This
 3. **User confirms**:
    - Write to `synthesis/` for cross-source analysis, or
    - Update an existing `concepts/` or `comparisons/` page with new information
-   - Set `custom-status=draft` for new pages (human verification needed)
-   - Mirror all 8 `custom-*` attributes
+   - Set `custom-status=draft`, `custom-confidence=low` (0-1 sources), `custom-depth=beginner` as initial values. These three fields are auto-derived by maintain cycles — no manual upgrades.
+   - Mirror all 9 `custom-*` attributes
    - Append log entry: `- YYYY-MM-DD query writeback — <topic>，写回 <n> 页面`
 
 4. **User declines**: Record the reason in `log` to avoid repeating the suggestion:

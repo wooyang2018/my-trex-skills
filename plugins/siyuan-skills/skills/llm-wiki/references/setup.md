@@ -51,16 +51,30 @@ index
 log
 hot
 audit
-_meta
-_meta/manifest
 concepts
 references
 synthesis
 comparisons
 contradictions
+projects
+journal
 ```
 
-Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`, `_meta/manifest`) only when intentionally refreshing them.
+Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`) only when intentionally refreshing them.
+
+## Flashcard deck setup
+
+Depth assessment relies on SiYuan flashcards. A deck named `wiki-cards` must exist before concept flashcards can be registered.
+
+1. Check if the deck already exists:
+
+```bash
+siyuan-sisyphus flashcard get_decks --json
+```
+
+2. If `wiki-cards` is not in the list, ask the user to create it in SiYuan UI (设置 → 闪卡 → 添加牌组, name it `wiki-cards`). CLI cannot create decks.
+
+3. Verify the deck was created by running step 1 again. Note the deck ID for use during ingest.
 
 ## Verification
 

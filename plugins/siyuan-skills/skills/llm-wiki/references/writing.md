@@ -6,14 +6,14 @@ Use this before writing or restructuring wiki pages.
 
 | Type | Target |
 |---|---|
-| concept | 400-1200 words |
+| concept | 600-2000 words (core 400-800, depth 200-1200) |
 | reference | 150-400 words |
 | synthesis | 600-1500 words |
 | comparison | 400-1000 words |
 | contradiction | 150-400 words |
 | project overview | 200-600 words |
 
-Split a concept when it would exceed about 1200 words or when several sections deserve independent links. Create `concepts/<topic>` as the overview page, then focused child pages under it.
+Split a concept when it would exceed about 2000 words or when several sections deserve independent links. Create `concepts/<topic>` as the overview page, then focused child pages under it.
 
 ## Key rule: no body frontmatter or `# Title`
 
@@ -25,40 +25,132 @@ SiYuan auto-generates a frontmatter block and `# Title` heading for every docume
 
 ### Concept
 
-`concepts/` 涵盖抽象概念和具体命名对象。模板中的中间段按主题灵活调整——抽象概念侧重 How It Works 和 Tradeoffs，具体对象侧重特征和关联。被多处引用的具体对象自然成为图枢纽。
+`concepts/` 涵盖抽象概念和具体命名对象。模板分为**核心段**（AI 草拟时自动生成）和**深入段**（人工补充为主，面试关键）。模板中的中间段按主题灵活调整——抽象概念侧重 How It Works 和 Why This Way，具体对象侧重 Overview 和 Key Characteristics。被多处引用的具体对象自然成为图枢纽。
+
+**核心段**（必填，AI 草拟）：定义、How It Works、Examples、Related、Sources
+**深入段**（面试关键，人工补充为主）：In My Own Words、Why This Way、When to Use / When Not、Common Pitfalls、Interview Questions、Practice Ideas
+**闪卡段**（AI 生成，自动注册）：Flashcards — 3 个层次的问题（L1 定义/L2 原理/L3 动机），注册到思源闪卡系统，复习表现自动派生 `custom-depth`
+
+深入段是面试加分的关键。AI 草拟时可以预填能推断的内容（如从来源提取的 Examples、Common Pitfalls），但 `## In My Own Words` 和 `## Interview Questions` 必须人工填写——前者是费曼复述验证理解，后者是面试追问的预案。深入段留空不影响页面创建，但 lint 会报告"深入段缺失"提醒你回头补充。`## Flashcards` 段由 AI 生成，不需要人工填写——它是深度衡量的客观依据。
+
+抽象概念模板：
 
 ```markdown
-One-sentence definition or description.
+One-sentence definition.
 
-## What It Is
+## In My Own Words
+
+<!-- 费曼复述：不背定义，用自己的话解释。如果解释不清楚，说明还没真正理解。必须人工填写 -->
 
 ## How It Works
 
+<!-- 原理和机制。底层是怎么实现的 -->
+
+## Why This Way
+
+<!-- 设计动机：为什么是这样设计而不是另一种方式。历史背景、解决什么问题、放弃了哪些替代方案。面试官最看重这一段 -->
+
+## Examples
+
+<!-- 最小可运行代码示例或具体场景 -->
+
+## When to Use / When Not
+
+<!-- 适用场景和不适用场景 -->
+
 ## Tradeoffs
+
+<!-- 优缺点。选择这个的代价是什么 -->
+
+## Common Pitfalls
+
+<!-- 常见误区、陷阱、踩坑经验 -->
+
+## Interview Questions
+
+<!-- 面试官可能追问的问题，以及你的思考方向。不需要完整答案，但要知道怎么切入。必须人工填写 -->
+
+## Practice Ideas
+
+<!-- 如何练习这个知识点。小项目、练习题、实际应用方向 -->
+
+## Flashcards
+
+<!-- AI 生成 3 个层次的闪卡问题，注册到思源闪卡系统。复习表现自动决定 custom-depth，不需要自己判断理解深度 -->
+
+L1（定义）什么是 X？它的核心特征是什么？
+
+L2（原理）X 是如何工作的？什么场景适合用，什么场景不适合？
+
+L3（动机）为什么 X 这样设计？这个设计放弃了什么替代方案？
 
 ## Related
 
-- ((<doc-id> 'Related Page')) — relation.
+**前置依赖**（学这个之前应该先懂）：
+
+- ((<doc-id> 'Prerequisite Page')) — 为什么需要先懂
+
+**延伸学习**（学这个之后可以深入）：
+
+- ((<doc-id> 'Extension Page')) — 延伸方向
 
 ## Sources
 
 #tag-a# #tag-b#
 ```
 
-For concrete named objects (tools, people, organizations), adapt the middle sections:
+具体命名对象模板（工具、人物、组织、技术）：
 
 ```markdown
 One-sentence description in this wiki's scope.
+
+## In My Own Words
+
+<!-- 费曼复述：用自己的话描述这个东西是什么、为什么重要。必须人工填写 -->
 
 ## Overview
 
 ## Key Characteristics
 
-## Relationships
+## Why It Matters
+
+<!-- 为什么这个东西重要，它解决了什么问题 -->
+
+## Common Use Cases
+
+## Alternatives
+
+<!-- 替代方案和对比 -->
+
+## Common Pitfalls
+
+## Interview Questions
+
+<!-- 面试可能问到的问题。必须人工填写 -->
+
+## Practice Ideas
+
+<!-- 如何通过实践加深理解 -->
+
+## Flashcards
+
+<!-- AI 生成 3 个层次的闪卡问题，注册到思源闪卡系统。复习表现自动决定 custom-depth -->
+
+L1（定义）X 是什么？它的核心特征是什么？
+
+L2（原理）X 如何解决它解决的问题？常见的使用场景有哪些？
+
+L3（动机）为什么选择 X 而不是替代方案？它的关键权衡是什么？
 
 ## Related
 
-- ((<doc-id> 'Related Page')) — relation.
+**前置依赖**（学这个之前应该先懂）：
+
+- ((<doc-id> 'Prerequisite Page')) — 为什么需要先懂
+
+**延伸学习**（学这个之后可以深入）：
+
+- ((<doc-id> 'Extension Page')) — 延伸方向
 
 ## Sources
 
@@ -175,9 +267,75 @@ One-sentence conflict description.
 <!-- filled in when processed -->
 ```
 
+### Project (learning plan + practice record)
+
+`projects/` 用于学习计划和实践记录。每个学习领域或练手项目一个页面，通过块引用关联 `concepts/` 中的知识页面，形成"学什么→练什么"的闭环。
+
+```markdown
+One-sentence project/learning goal description.
+
+## Goal
+
+<!-- 这个学习/实践项目的目标是什么 -->
+
+## Scope
+
+<!-- 涵盖哪些概念和技能 -->
+
+## Plan
+
+<!-- 学习/实践计划，按顺序列出里程碑。用块引用关联 concepts/ 页面 -->
+
+1. [ ] Milestone 1 — ((<doc-id> 'Related Concept'))
+2. [ ] Milestone 2 — ((<doc-id> 'Related Concept'))
+3. [ ] Milestone 3
+
+## Progress
+
+<!-- 当前进度，完成后打勾。记录哪些 concept 的 custom-depth 升级了 -->
+
+## Practice Notes
+
+<!-- 实践中的发现、踩坑、经验。对应"多练"的沉淀 -->
+
+## Related Concepts
+
+- ((<doc-id> 'Concept Page')) — 在这个项目中学到/用到的
+
+## Sources
+
+#tag-a# #tag-b#
+```
+
+### Journal (learning reflection)
+
+`journal/` 用于学习反思日志。学完一组概念后写"学到了什么、还有什么不清楚"，费曼式自检。对应"多想"的反思沉淀。
+
+```markdown
+One-sentence session summary.
+
+## What I Learned
+
+<!-- 这次学习/复习的核心收获 -->
+
+## What Confused Me
+
+<!-- 还不清楚的地方，需要后续深挖 -->
+
+## Feynman Check
+
+<!-- 用自己的话复述今天学的核心概念。如果卡住了，那就是要回去补的 -->
+
+## Next Steps
+
+<!-- 下一步该学什么、练什么 -->
+
+#tag-a# #tag-b#
+```
+
 ## Metadata mirror
 
-After writing a page, mirror all 8 fields to attributes (this is the **primary** metadata store; SQL queries rely on these):
+After writing a page, mirror all 9 fields to attributes (this is the **primary** metadata store; SQL queries rely on these):
 
 ```bash
 siyuan-sisyphus block set_attrs --id "$DOC_ID" --attrs-json '{
@@ -187,22 +345,25 @@ siyuan-sisyphus block set_attrs --id "$DOC_ID" --attrs-json '{
   "custom-sources": "source-a",
   "custom-summary": "One-sentence summary.",
   "custom-status": "draft",
-  "custom-confidence": "medium",
+  "custom-confidence": "low",
+  "custom-depth": "beginner",
   "custom-updated": "2026-06-28"
 }'
 ```
 
-**Status and confidence defaults by category**:
+**初始值（ingest 时写入），maintain 周期自动重算**：
 
-| Category | custom-status | custom-confidence |
-|---|---|---|
-| concepts/ | draft | medium |
-| references/ | verified | high |
-| synthesis/ | draft | medium |
-| comparisons/ | draft | medium |
-| contradictions/ | draft | low |
+| Category | custom-status (初始) | custom-confidence (初始) | custom-depth (初始) |
+|---|---|---|---|
+| concepts/ | draft | low (0-1 sources) | beginner |
+| references/ | verified | high | — (不适用) |
+| synthesis/ | draft | low (0-1 sources) | — (不适用) |
+| comparisons/ | draft | low (0-1 sources) | — (不适用) |
+| contradictions/ | draft | low | — (不适用) |
 
-Upgrade `custom-status` to `verified` only after human review. Upgrade `custom-confidence` to `high` when multiple independent sources corroborate.
+`custom-status`、`custom-confidence`、`custom-depth` 三个字段由 maintain 周期自动派生，**不需要人工维护**。派生规则见 `SKILL.md` 的「自动派生规则」段。
+
+`custom-depth` 仅对 `concepts/` 页面有意义，由闪卡复习表现决定。ingest 时创建 concept 页面的 `## Flashcards` 段并注册闪卡后，用户在思源中复习闪卡，maintain 周期根据复习状态自动更新 depth。
 
 ## SiYuan Native Features
 
