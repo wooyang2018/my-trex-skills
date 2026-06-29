@@ -18,11 +18,14 @@ Resolve configuration from a single source:
 2. If it does not exist, ask the user for the notebook id from `notebook list --json`, then create it by writing the
    template below to `~/.siyuan-wiki/config`.
 
-### Required fields (user must provide)
+### Required fields
 
 - `SIYUAN_NOTEBOOK_ID` — immutable notebook id like `20241205084226-rl6jd3a`.
   Used for `--notebook`, `document lookup`, and `search query_sql ... box=`.
   Discover via `siyuan-sisyphus notebook list --json`.
+- `SIYUAN_FLASHCARD_DECK_ID` — the `wiki-cards` flashcard deck id.
+  All flashcard CLI commands (`create_card`, `list_cards`, `review_card`, `remove_card`) read this from config.
+  Discover or create via the Flashcard setup flow below.
 For `fs` commands, resolve the current notebook name at runtime with
 `siyuan-sisyphus notebook list --json` and use `/<resolved-name>/<hpath>`.
 Do not persist a second notebook identity in config.
@@ -35,6 +38,9 @@ When `~/.siyuan-wiki/config` does not exist, generate it with these contents
 ```toml
 # siyuan-wiki — Global Configuration (single source of truth)
 SIYUAN_NOTEBOOK_ID="<fill-from-notebook-list>"
+
+# Flashcard deck ID — wiki-cards deck (created during setup)
+SIYUAN_FLASHCARD_DECK_ID="<fill-from-flashcard-setup>"
 
 # Optional: override the active siyuan-sisyphus profile.
 SIYUAN_PROFILE=
@@ -62,19 +68,19 @@ journal
 
 Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`) only when intentionally refreshing them.
 
-## Flashcard deck setup
+## Flashcard setup
 
-Depth assessment relies on SiYuan flashcards. A deck named `wiki-cards` must exist before concept flashcards can be registered.
+Flashcards use a dedicated `wiki-cards` deck. The deck ID is stored in config as `SIYUAN_FLASHCARD_DECK_ID` and used by all flashcard CLI commands.
 
-1. Check if the deck already exists:
+Run the setup script — it is idempotent and handles everything: checks if the deck exists (via CLI `get_decks`), creates it via SiYuan API if missing (CLI cannot create decks), and writes the deck ID to config.
 
 ```bash
-siyuan-sisyphus flashcard get_decks --json
+python3 plugins/siyuan-skills/skills/llm-wiki/scripts/setup_flashcard_deck.py
+# → prints deck ID to stdout; status messages go to stderr
+# → updates ~/.siyuan-wiki/config with SIYUAN_FLASHCARD_DECK_ID="<deck-id>"
 ```
 
-2. If `wiki-cards` is not in the list, ask the user to create it in SiYuan UI (设置 → 闪卡 → 添加牌组, name it `wiki-cards`). CLI cannot create decks.
-
-3. Verify the deck was created by running step 1 again. Note the deck ID for use during ingest.
+After setup, all flashcard operations read `SIYUAN_FLASHCARD_DECK_ID` from config — no runtime deck discovery needed. See `ingest.md` for the card registration flow.
 
 ## Verification
 

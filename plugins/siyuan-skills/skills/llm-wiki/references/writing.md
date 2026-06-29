@@ -29,7 +29,7 @@ SiYuan auto-generates a frontmatter block and `# Title` heading for every docume
 
 **核心段**（必填，AI 草拟）：定义、How It Works、Examples、Related、Sources
 **深入段**（面试关键，人工补充为主）：In My Own Words、Why This Way、When to Use / When Not、Common Pitfalls、Interview Questions、Practice Ideas
-**闪卡段**（AI 生成，自动注册）：Flashcards — 3 个层次的问题（L1 定义/L2 原理/L3 动机），注册到思源闪卡系统，复习表现自动派生 `custom-depth`
+**闪卡段**（AI 生成，自动注册）：Flashcards — 3 个层次的闪卡（L1 定义填空/L2 原理问答/L3 动机问答），注册到思源闪卡系统，复习表现自动派生 `custom-depth`
 
 深入段是面试加分的关键。AI 草拟时可以预填能推断的内容（如从来源提取的 Examples、Common Pitfalls），但 `## In My Own Words` 和 `## Interview Questions` 必须人工填写——前者是费曼复述验证理解，后者是面试追问的预案。深入段留空不影响页面创建，但 lint 会报告"深入段缺失"提醒你回头补充。`## Flashcards` 段由 AI 生成，不需要人工填写——它是深度衡量的客观依据。
 
@@ -40,49 +40,67 @@ One-sentence definition.
 
 ## In My Own Words
 
-<!-- 费曼复述：不背定义，用自己的话解释。如果解释不清楚，说明还没真正理解。必须人工填写 -->
+> [!NOTE]
+> 费曼复述：不背定义，用自己的话解释。如果解释不清楚，说明还没真正理解。必须人工填写。
 
 ## How It Works
 
-<!-- 原理和机制。底层是怎么实现的 -->
+> [!NOTE]
+> 原理和机制。底层是怎么实现的。
 
 ## Why This Way
 
-<!-- 设计动机：为什么是这样设计而不是另一种方式。历史背景、解决什么问题、放弃了哪些替代方案。面试官最看重这一段 -->
+> [!NOTE]
+> 设计动机：为什么是这样设计而不是另一种方式。历史背景、解决什么问题、放弃了哪些替代方案。面试官最看重这一段。
 
 ## Examples
 
-<!-- 最小可运行代码示例或具体场景 -->
+> [!NOTE]
+> 最小可运行代码示例或具体场景。
 
 ## When to Use / When Not
 
-<!-- 适用场景和不适用场景 -->
+> [!NOTE]
+> 适用场景和不适用场景。
 
 ## Tradeoffs
 
-<!-- 优缺点。选择这个的代价是什么 -->
+> [!NOTE]
+> 优缺点。选择这个的代价是什么。
 
 ## Common Pitfalls
 
-<!-- 常见误区、陷阱、踩坑经验 -->
+> [!NOTE]
+> 常见误区、陷阱、踩坑经验。
 
 ## Interview Questions
 
-<!-- 面试官可能追问的问题，以及你的思考方向。不需要完整答案，但要知道怎么切入。必须人工填写 -->
+> [!NOTE]
+> 面试官可能追问的问题，以及你的思考方向。不需要完整答案，但要知道怎么切入。必须人工填写。
 
 ## Practice Ideas
 
-<!-- 如何练习这个知识点。小项目、练习题、实际应用方向 -->
+> [!NOTE]
+> 如何练习这个知识点。小项目、练习题、实际应用方向。
 
 ## Flashcards
 
-<!-- AI 生成 3 个层次的闪卡问题，注册到思源闪卡系统。复习表现自动决定 custom-depth，不需要自己判断理解深度 -->
+> [!NOTE]
+> AI 生成 3 个层次的闪卡，注册到思源闪卡系统。L1 为填空题（段落块，用 `==标记==` 挖空核心术语与特征，复习时回想填入）；L2/L3 为问答题（超级块 `{{{row}}}`，首子块=问题、其余子块=答案，复习先回想再翻答案）。复习表现自动决定 custom-depth，不需要自己判断理解深度。
 
-L1（定义）什么是 X？它的核心特征是什么？
+L1（定义）==X== 是 <一句话定义>，核心特征包括 ==特征1==、==特征2==。
 
+{{{row
 L2（原理）X 是如何工作的？什么场景适合用，什么场景不适合？
 
+<简明原理与适用/不适用场景，1-2 句>
+}}}
+
+{{{row
 L3（动机）为什么 X 这样设计？这个设计放弃了什么替代方案？
+
+<简明设计动机与被放弃的替代方案，1-2 句>
+}}}
 
 ## Related
 
@@ -106,7 +124,8 @@ One-sentence description in this wiki's scope.
 
 ## In My Own Words
 
-<!-- 费曼复述：用自己的话描述这个东西是什么、为什么重要。必须人工填写 -->
+> [!NOTE]
+> 费曼复述：用自己的话描述这个东西是什么、为什么重要。必须人工填写。
 
 ## Overview
 
@@ -114,33 +133,46 @@ One-sentence description in this wiki's scope.
 
 ## Why It Matters
 
-<!-- 为什么这个东西重要，它解决了什么问题 -->
+> [!NOTE]
+> 为什么这个东西重要，它解决了什么问题。
 
 ## Common Use Cases
 
 ## Alternatives
 
-<!-- 替代方案和对比 -->
+> [!NOTE]
+> 替代方案和对比。
 
 ## Common Pitfalls
 
 ## Interview Questions
 
-<!-- 面试可能问到的问题。必须人工填写 -->
+> [!NOTE]
+> 面试可能问到的问题。必须人工填写。
 
 ## Practice Ideas
 
-<!-- 如何通过实践加深理解 -->
+> [!NOTE]
+> 如何通过实践加深理解。
 
 ## Flashcards
 
-<!-- AI 生成 3 个层次的闪卡问题，注册到思源闪卡系统。复习表现自动决定 custom-depth -->
+> [!NOTE]
+> AI 生成 3 个层次的闪卡，注册到思源闪卡系统。L1 为填空题（段落块，用 `==标记==` 挖空核心术语与特征）；L2/L3 为问答题（超级块 `{{{row}}}`，首子块=问题、其余子块=答案）。复习表现自动决定 custom-depth。
 
-L1（定义）X 是什么？它的核心特征是什么？
+L1（定义）==X== 是 <一句话描述>，核心特征包括 ==特征1==、==特征2==。
 
+{{{row
 L2（原理）X 如何解决它解决的问题？常见的使用场景有哪些？
 
+<简明解决方式与使用场景，1-2 句>
+}}}
+
+{{{row
 L3（动机）为什么选择 X 而不是替代方案？它的关键权衡是什么？
+
+<简明选择动机与关键权衡，1-2 句>
+}}}
 
 ## Related
 
@@ -250,7 +282,8 @@ One-sentence conflict description.
 
 ## Resolution
 
-<!-- filled when resolved -->
+> [!NOTE]
+> 矛盾解决后在此填写结论。
 
 #tag-a# #tag-b#
 ```
@@ -264,7 +297,8 @@ One-sentence conflict description.
 
 # Resolution
 
-<!-- filled in when processed -->
+> [!NOTE]
+> 审计处理后在此填写结论。
 ```
 
 ### Project (learning plan + practice record)
@@ -276,15 +310,18 @@ One-sentence project/learning goal description.
 
 ## Goal
 
-<!-- 这个学习/实践项目的目标是什么 -->
+> [!NOTE]
+> 这个学习/实践项目的目标是什么。
 
 ## Scope
 
-<!-- 涵盖哪些概念和技能 -->
+> [!NOTE]
+> 涵盖哪些概念和技能。
 
 ## Plan
 
-<!-- 学习/实践计划，按顺序列出里程碑。用块引用关联 concepts/ 页面 -->
+> [!NOTE]
+> 学习/实践计划，按顺序列出里程碑。用块引用关联 concepts/ 页面。
 
 1. [ ] Milestone 1 — ((<doc-id> 'Related Concept'))
 2. [ ] Milestone 2 — ((<doc-id> 'Related Concept'))
@@ -292,11 +329,13 @@ One-sentence project/learning goal description.
 
 ## Progress
 
-<!-- 当前进度，完成后打勾。记录哪些 concept 的 custom-depth 升级了 -->
+> [!NOTE]
+> 当前进度，完成后打勾。记录哪些 concept 的 custom-depth 升级了。
 
 ## Practice Notes
 
-<!-- 实践中的发现、踩坑、经验。对应"多练"的沉淀 -->
+> [!NOTE]
+> 实践中的发现、踩坑、经验。对应"多练"的沉淀。
 
 ## Related Concepts
 
@@ -316,19 +355,23 @@ One-sentence session summary.
 
 ## What I Learned
 
-<!-- 这次学习/复习的核心收获 -->
+> [!NOTE]
+> 这次学习/复习的核心收获。
 
 ## What Confused Me
 
-<!-- 还不清楚的地方，需要后续深挖 -->
+> [!NOTE]
+> 还不清楚的地方，需要后续深挖。
 
 ## Feynman Check
 
-<!-- 用自己的话复述今天学的核心概念。如果卡住了，那就是要回去补的 -->
+> [!NOTE]
+> 用自己的话复述今天学的核心概念。如果卡住了，那就是要回去补的。
 
 ## Next Steps
 
-<!-- 下一步该学什么、练什么 -->
+> [!NOTE]
+> 下一步该学什么、练什么。
 
 #tag-a# #tag-b#
 ```

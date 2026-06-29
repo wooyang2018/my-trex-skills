@@ -74,6 +74,9 @@ siyuan-sisyphus notebook list --json
 ```toml
 # siyuan-wiki — Global Configuration
 SIYUAN_NOTEBOOK_ID="<your-notebook-id>"
+
+# Flashcard deck ID — wiki-cards deck (created during setup)
+SIYUAN_FLASHCARD_DECK_ID="<your-deck-id>"
 ```
 
 笔记本 ID 从 `notebook list --json` 的输出中获取，形如 `20241205084226-rl6jd3a`。
@@ -86,16 +89,27 @@ SIYUAN_NOTEBOOK_ID="<your-notebook-id>"
 2. 检查笔记本权限
 3. 验证结构完整性
 
-### 设置闪卡牌组
+### 闪卡设置
 
-深度评估依赖思源闪卡系统。需要手动在思源 UI 中创建一个名为 `wiki-cards` 的闪卡牌组：
+深度评估依赖思源闪卡系统。闪卡注册到 `wiki-cards` 牌组，牌组 ID 存储在 config 的 `SIYUAN_FLASHCARD_DECK_ID` 中，所有闪卡 CLI 命令自动读取。
 
-1. 打开思源 → 设置 → 闪卡
-2. 添加牌组，命名为 `wiki-cards`
-3. 验证创建成功：
+首次使用时，运行初始化脚本（幂等，可重复执行）——脚本自动检查牌组存在性、创建缺失的牌组、写入 config：
 
 ```bash
-siyuan-sisyphus flashcard get_decks --json
+python3 plugins/siyuan-skills/skills/llm-wiki/scripts/setup_flashcard_deck.py
+# → 更新 ~/.siyuan-wiki/config 的 SIYUAN_FLASHCARD_DECK_ID
+```
+
+每个 concept 页面生成 3 张闪卡，思源按块类型自动判定卡片类型：
+
+- **L1（定义）填空题**：段落块，核心术语与特征用 `==标记==` 挖空，复习时回想填入
+- **L2（原理）问答题**：超级块，首子块为问题、其余子块为答案，复习先回想再翻答案
+- **L3（动机）问答题**：同 L2，聚焦设计动机与权衡
+
+之后每次 ingest concept 页面时自动完成闪卡注册。你也可以验证闪卡状态：
+
+```bash
+siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter new --json
 ```
 
 ---
@@ -261,7 +275,7 @@ Related 段区分**前置依赖**和**延伸学习**，让学习路径可见：
 1. 写入 concept 页面（包含 `## Flashcards` 段）
 2. SQL 查找 L1/L2/L3 块 ID
 3. 为每个块设置 `custom-card-level` 属性
-4. 通过 `flashcard create_card` 注册到 `wiki-cards` 牌组
+4. 通过 CLI `create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID"` 注册为闪卡
 
 ---
 
@@ -296,7 +310,7 @@ maintain 周期会自动重算 3 个字段：
 
 **custom-depth**（由闪卡复习表现决定）：
 
-读取 `wiki-cards` 牌组中所有卡片的复习状态，按 L1/L2/L3 层次判断深度。
+读取 wiki-cards 牌组中所有闪卡的复习状态（`list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID"`），按 L1/L2/L3 层次判断深度。
 
 ### 质量指标（8 项）
 
@@ -442,7 +456,7 @@ ingest 时写入的初始值：
 
 ### 闪卡创建失败
 
-确保 `wiki-cards` 牌组已在思源 UI 中创建。CLI 不能创建牌组，只能注册卡片到已有牌组。
+闪卡由 AI 自动注册到 `wiki-cards` 牌组（牌组 ID 从 config 读取）。如果闪卡注册失败，检查 SiYuan 内核是否在运行，以及 config 中 `SIYUAN_FLASHCARD_DECK_ID` 是否正确。
 
 ### custom-depth 一直是 beginner
 
@@ -483,10 +497,11 @@ siyuan-sisyphus search query_sql --sql "SELECT id,hpath FROM blocks WHERE box='$
 # 全文搜索
 siyuan-sisyphus search fulltext --query "terms" --page 1 --page-size 20 --json
 
-# 闪卡
-siyuan-sisyphus flashcard get_decks --json
-siyuan-sisyphus flashcard create_card --deck-id "<deck-id>" --block-ids-json '["<block-id>"]'
-siyuan-sisyphus flashcard list_cards --deck-id "<deck-id>" --scope deck --filter new --json
+# 闪卡（deck ID 从 config 的 SIYUAN_FLASHCARD_DECK_ID 读取）
+siyuan-sisyphus flashcard create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --block-ids-json '["<block-id>"]'
+siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter new --json
+siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter old --json
+siyuan-sisyphus flashcard review_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --card-id "<card-id>" --rating 2
 
 # 日志追加
 siyuan-sisyphus block append --parent-id "$LOG_DOC_ID" --data-type markdown --data "..."

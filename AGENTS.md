@@ -101,10 +101,11 @@ siyuan-sisyphus notebook list
 1. **读取全局配置** — 从 `~/.siyuan-wiki/config` 读取所有配置项。这是唯一的配置来源。
 2. **提示初始化** — 若配置不存在，提示用户运行 `wiki-setup`。
 
-配置提供两个笔记本变量（均为必需，不可互相推导）：
+配置提供三个变量（均为必需，不可互相推导）：
 
 - `SIYUAN_NOTEBOOK_ID` — 用于 `--notebook` 参数、`query_sql ... WHERE box='<id>'`、`document lookup` 等
 - `SIYUAN_NOTEBOOK_NAME` — 仅用于 `fs *` 工作区路径（以笔记本名作为首段）和人可读日志
+- `SIYUAN_FLASHCARD_DECK_ID` — wiki-cards 闪卡牌组 ID，所有闪卡 CLI 命令（`create_card`、`list_cards`、`review_card`、`remove_card`）从 config 读取此值
 
 ### 笔记本结构
 
@@ -233,8 +234,9 @@ wiki 页面之间的所有内部链接写为思源原生块引用：
 3. **长文档/列表** — 加 `--page N --page-size 8000` 避免截断
 4. **多行内容写入** — 用 `block append` / `block insert` / `fs write`，不要用 `block update`（会截断）
 5. **Excalidraw 嵌入** — 走 `scripts/excalidraw_compose.py`（Python ≥ 3.8），不要手拼 base64
-6. **wiki 页面必须有 custom 属性** — `custom-title`、`custom-category`、`custom-tags`、`custom-sources`、`custom-summary`、`custom-status`（draft|verified|outdated，**自动派生**）、`custom-confidence`（low|medium|high，**自动派生**）、`custom-depth`（beginner|intermediate|advanced，仅 concepts/，**闪卡自动派生**）、`custom-updated`，共 9 个字段（其中 3 个自动派生），通过 `block set_attrs --attrs-json` 写入（不写 YAML frontmatter）
-7. **知识图谱边用块引用** — `((doc-id "display text"))`，不用 `[[wikilink]]`
+6. **闪卡牌组初始化** — 走 `skills/llm-wiki/scripts/setup_flashcard_deck.py`（幂等），不要手拼 curl 调 createRiffDeck API；脚本自动检查牌组存在性、创建、写 config
+7. **wiki 页面必须有 custom 属性** — `custom-title`、`custom-category`、`custom-tags`、`custom-sources`、`custom-summary`、`custom-status`（draft|verified|outdated，**自动派生**）、`custom-confidence`（low|medium|high，**自动派生**）、`custom-depth`（beginner|intermediate|advanced，仅 concepts/，**闪卡自动派生**）、`custom-updated`，共 9 个字段（其中 3 个自动派生），通过 `block set_attrs --attrs-json` 写入（不写 YAML frontmatter）
+8. **知识图谱边用块引用** — `((doc-id "display text"))`，不用 `[[wikilink]]`
 
 ---
 

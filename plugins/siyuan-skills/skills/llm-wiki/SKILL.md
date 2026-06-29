@@ -26,7 +26,7 @@ description: >
 ## 硬规则
 
 1. **唯一访问层**：所有思源读写使用 `siyuan-sisyphus`。不要直接访问思源工作区文件，不要自写思源请求。
-2. **配置解析**：从 `~/.siyuan-wiki/config` 读取配置。只保存 `SIYUAN_NOTEBOOK_ID`；需要 `fs` 路径时用 `notebook list --json` 按 ID 解析当前名称作为路径首段。
+2. **配置解析**：从 `~/.siyuan-wiki/config` 读取配置。保存 `SIYUAN_NOTEBOOK_ID`（笔记本 ID）和 `SIYUAN_FLASHCARD_DECK_ID`（wiki-cards 牌组 ID，所有闪卡 CLI 命令使用）；需要 `fs` 路径时用 `notebook list --json` 按 ID 解析当前名称作为路径首段。
 3. **预检**：首次操作先运行 `siyuan-sisyphus --version`、`siyuan-sisyphus config list`、`siyuan-sisyphus notebook get_permissions --notebook "$SIYUAN_NOTEBOOK_ID"`。
 4. **整页写入**：多行页面用 `fs write --overwrite`；日志追加用 `block append --data-type markdown`；不要用 `block update` 写多行。
 5. **元数据单写**：页面正文不包含 YAML frontmatter 和 `# 标题`行（思源自动生成 frontmatter 和标题）；元数据仅通过 `block set_attrs --attrs-json` 写 `custom-*` 属性。audit 文档也遵循此规则，所有字段通过 custom-* 属性存储。
@@ -112,7 +112,7 @@ journal/
 
 **custom-depth**（由闪卡复习表现决定，maintain 周期重算）：
 
-每个 concept 页面包含 3 个层次的闪卡（L1 定义/L2 原理/L3 动机）。maintain 周期读取闪卡复习状态，按以下规则派生 depth：
+每个 concept 页面包含 3 个层次的闪卡（L1 定义填空/L2 原理问答/L3 动机问答）。maintain 周期读取闪卡复习状态，按以下规则派生 depth：
 
 | 条件 | depth |
 |---|---|
@@ -152,9 +152,9 @@ siyuan-sisyphus block set_attrs --id "<doc-id>" --attrs-json '{
   "custom-updated": "2026-06-28"
 }'
 
-# 步骤 3（仅 concepts/）：注册闪卡——找到 Flashcards 段的 3 个块并挂卡
-siyuan-sisyphus search query_sql --sql "SELECT id, content FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<doc-id>' AND type='p' AND (content LIKE 'L1（%' OR content LIKE 'L2（%' OR content LIKE 'L3（%') LIMIT 10" --json
-# 对每个块设 custom-card-level 属性，然后用 flashcard create_card 挂卡
+# 步骤 3（仅 concepts/）：注册闪卡——找到 Flashcards 段的 3 个块（L1 段落块填空 + L2/L3 超级块问答），设 custom-card-level 属性，然后通过 CLI create_card 注册到 wiki-cards 牌组（deck ID 从 config 读取）
+siyuan-sisyphus search query_sql --sql "SELECT id, type FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<doc-id>' AND ((type='p' AND content LIKE '%L1（%') OR (type='s' AND (content LIKE '%L2（%' OR content LIKE '%L3（%'))) LIMIT 10" --json
+# 对每个块设 custom-card-level 属性（L2/L3 设在超级块上），然后 CLI create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" 注册（思源按块类型自动判定：段落含 ==标记== → 填空题；超级块 → 问答题；见 ingest.md 闪卡注册段）
 ```
 
 写入后用 `fs read` 或 `document lookup` 验证；不要用全文搜索验证刚写入的内容。

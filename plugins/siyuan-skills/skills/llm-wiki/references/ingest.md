@@ -56,30 +56,35 @@ Do not silently overwrite an existing conclusion when a conflict is detected. Th
 
 After writing a concept page (step 8), register its flashcard blocks as SiYuan flashcards. This enables flashcard-based depth assessment — your review performance automatically determines `custom-depth`, no self-assessment needed.
 
-**Prerequisite**: A flashcard deck named `wiki-cards` must exist. Check with `flashcard get_decks --json`; if missing, ask the user to create it in SiYuan UI (see `setup.md`).
+**Prerequisite**: `SIYUAN_FLASHCARD_DECK_ID` is read from config (see `setup.md`). All flashcard CLI commands use this deck ID.
 
 **Steps**:
 
-1. Find the 3 flashcard block IDs in the concept page:
+1. Find the 3 flashcard block IDs in the concept page. L1 is a paragraph block (`type='p'`, cloze card — its `==mark==` spans are the cloze deletions); L2/L3 are superblocks (`type='s'`, Q&A cards — first child block = question, remaining child blocks = answer):
 
 ```bash
-siyuan-sisyphus search query_sql --sql "SELECT id, content FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<concept-doc-id>' AND type='p' AND (content LIKE 'L1（%' OR content LIKE 'L2（%' OR content LIKE 'L3（%') LIMIT 10" --json
+siyuan-sisyphus search query_sql --sql "SELECT id, type FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<concept-doc-id>' AND ((type='p' AND content LIKE '%L1（%') OR (type='s' AND (content LIKE '%L2（%' OR content LIKE '%L3（%'))) LIMIT 10" --json
 ```
 
-2. For each block, set its `custom-card-level` attribute:
+> A superblock's `content` is the concatenation of its child blocks' text, so `content LIKE '%L2（%'` matches the L2 superblock (whose first child starts with `L2（`). The L2/L3 first-child paragraph blocks are excluded because the query restricts L2/L3 to `type='s'`.
+
+2. For each block, set its `custom-card-level` attribute (on the superblock itself for L2/L3, not on its child blocks):
 
 ```bash
 siyuan-sisyphus block set_attrs --id "<block-id>" --attrs-json '{"custom-card-level": "L1"}'
 # Repeat for L2 and L3 blocks
 ```
 
-3. Register all 3 blocks as flashcards in the wiki-cards deck:
+3. Register all 3 blocks as flashcards via CLI `create_card`. SiYuan auto-detects the card type from the block: a paragraph block containing `==mark==` becomes a cloze card; a superblock becomes a Q&A card (question = first child block, answer = remaining child blocks):
 
 ```bash
-siyuan-sisyphus flashcard create_card --deck-id "$WIKI_DECK_ID" --block-ids-json '["<l1-block-id>","<l2-block-id>","<l3-block-id>"]'
+siyuan-sisyphus flashcard create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" \
+  --block-ids-json '["<l1-block-id>","<l2-block-id>","<l3-block-id>"]'
 ```
 
-If deck creation or card registration fails (e.g., deck doesn't exist), log a warning but do not block the ingest. The user can register cards later.
+`create_card` validates the deck ID against `get_decks`, then calls SiYuan's `addRiffCards` internally — it writes `custom-riff-decks` and registers the riff card transactionally. No API curl needed.
+
+If card registration fails, log a warning but do not block the ingest. The user can register cards later.
 
 ## Log entry
 

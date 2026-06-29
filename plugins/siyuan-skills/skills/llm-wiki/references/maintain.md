@@ -54,33 +54,32 @@ siyuan-sisyphus search query_sql --sql "SELECT r.block_id, r.root_id FROM refs r
 
 ### 3. Recalculate custom-depth (flashcard-based, concepts/ only)
 
-For each concept page, check its flashcard review states:
+For each concept page, check its flashcard review states. Use `scope=deck` with `SIYUAN_FLASHCARD_DECK_ID` from config to query cards in the wiki-cards deck:
 
-1. Get the wiki-cards deck ID: `siyuan-sisyphus flashcard get_decks --json` → find deck named `wiki-cards`
-2. Get all flashcard blocks with their levels:
-
-```bash
-siyuan-sisyphus search query_sql --sql "SELECT b.id, b.hpath, a.value as level FROM blocks b JOIN attributes a ON a.block_id=b.id AND a.name='custom-card-level' WHERE b.box='$SIYUAN_NOTEBOOK_ID' AND b.type='p' LIMIT 500" --json
-```
-
-3. Get reviewed cards (cards the user has practiced at least once):
+1. Get all flashcard blocks with their levels:
 
 ```bash
-siyuan-sisyphus flashcard list_cards --deck-id "$WIKI_DECK_ID" --scope deck --filter old --page 1 --page-size 1000 --json
+siyuan-sisyphus search query_sql --sql "SELECT b.id, b.hpath, a.value as level FROM blocks b JOIN attributes a ON a.block_id=b.id AND a.name='custom-card-level' WHERE b.box='$SIYUAN_NOTEBOOK_ID' AND b.type IN ('p','s') LIMIT 500" --json
 ```
 
-4. Get new cards (never reviewed):
+2. Get reviewed cards (cards the user has practiced at least once):
 
 ```bash
-siyuan-sisyphus flashcard list_cards --deck-id "$WIKI_DECK_ID" --scope deck --filter new --page 1 --page-size 1000 --json
+siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter old --page 1 --page-size 1000 --json
 ```
 
-5. For each concept, match its L1/L2/L3 block IDs to card states:
+3. Get new cards (never reviewed):
+
+```bash
+siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter new --page 1 --page-size 1000 --json
+```
+
+4. For each concept, match its L1/L2/L3 block IDs to card states:
    - Cards in the `old` list (reps > 0) = reviewed = counts for depth
    - Cards in the `new` list (reps = 0, state = 0) = not reviewed = doesn't count
    - Cards not in either list = not registered as flashcards
 
-6. Apply depth rules:
+5. Apply depth rules:
 
 | Condition | depth |
 |---|---|
@@ -89,9 +88,7 @@ siyuan-sisyphus flashcard list_cards --deck-id "$WIKI_DECK_ID" --scope deck --fi
 | L1+L2 reviewed but L3 not found or in `new` list | intermediate |
 | L1+L2+L3 all reviewed | advanced |
 
-7. Update `custom-depth` via `block set_attrs` where the value changed.
-
-If the `wiki-cards` deck doesn't exist or has no cards, skip depth recalculation and report "flashcard deck not configured — depth assessment unavailable".
+6. Update `custom-depth` via `block set_attrs` where the value changed.
 
 ## Quality metrics
 
