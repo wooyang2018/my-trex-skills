@@ -36,6 +36,7 @@
 | **wiki-graph** | "dedup" / "cross-link" / "fix my tags" / "color my graph" | 去重合并 + 交叉链接 + 标签分类法 + 图谱着色 |
 | **wiki-report** | "create a dashboard" / "weekly digest" / "context pack" | SQL 仪表板 + 周/月摘要 + Token 受限上下文包 |
 | **wiki-synthesis** | "synthesize my wiki" / "wiki-research" | 发现并填补综合缺口 + 自主多轮网络研究 |
+| **deep-study** | "深入研究《X》" / "研读 GO 圣经" / "调研 X 的原理和实战" / "面试级深度研究" | 面试与项目实践级深度学习——书籍系统研读 + 多源专项调研，产出面试追问链+实践方案，沉淀到 wiki（concept+闪卡+预填深入段 L4）|
 
 ### B. 迁入职能插件（`plugins/`）
 
@@ -237,6 +238,7 @@ wiki 页面之间的所有内部链接写为思源原生块引用：
 6. **闪卡牌组初始化** — 走 `skills/llm-wiki/scripts/setup_flashcard_deck.py`（幂等），不要手拼 curl 调 createRiffDeck API；脚本自动检查牌组存在性、创建、写 config
 7. **wiki 页面必须有 custom 属性** — `custom-title`、`custom-category`、`custom-tags`、`custom-sources`、`custom-summary`、`custom-status`（draft|verified|outdated，**自动派生**）、`custom-confidence`（low|medium|high，**自动派生**）、`custom-depth`（beginner|intermediate|advanced，仅 concepts/，**闪卡自动派生**）、`custom-updated`，共 9 个字段（其中 3 个自动派生），通过 `block set_attrs --attrs-json` 写入（不写 YAML frontmatter）
 8. **知识图谱边用块引用** — `((doc-id "display text"))`，不用 `[[wikilink]]`
+9. **深度学习调研走 deep-study** — 用户要求"深入研究一本书"/"面试级调研某技术"时，走 `skills/deep-study/`（book-study 或 topic-research 模式），产出必含面试追问链+实践方案+wiki 摄取（预填 concept 深入段 L4）；topic-research 调研须多源质量分级（T0 官方/论文/源码优先），复用 Task research_subagent 并行
 
 ---
 
