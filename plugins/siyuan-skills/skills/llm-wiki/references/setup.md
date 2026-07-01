@@ -55,7 +55,6 @@ Seed these roots if missing:
 ```text
 index
 log
-hot
 audit
 concepts
 references
@@ -66,7 +65,7 @@ projects
 journal
 ```
 
-Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`, `hot`) only when intentionally refreshing them.
+Use `fs write` without `--overwrite` for empty category roots so reruns do not overwrite user content. Use `--overwrite` for system documents (`index`) only when intentionally refreshing them.
 
 ## Flashcard setup
 

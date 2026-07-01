@@ -60,8 +60,9 @@ siyuan-sisyphus block append --parent-id <docId> --data-type markdown --data "{{
 
 要点：
 
-- 嵌入块**必须独占一行**，与上一段中间留空行。
-- 只能渲染 `blocks` 表的行（每行就是一个内容块）。SQL 内可 `JOIN attributes / refs / spans` 等辅助筛选，但 `SELECT` 列表必须是 `blocks` 的列（或 `blocks.*`），用 `SELECT *` 最稳——思源渲染需要 id/markdown/type/... 等多列，缺列会显示空白卡片。
+- 嵌入块**必须独占一行**，与上一段中间留空行。若 `{{ }}` 前紧挨文字（如 `标签：{{ ... }}`），思源会解析成普通段落而非嵌入块。
+- **`SELECT` 列表必须用 `*`（或 `blocks.*`）**——实测 SiYuan 3.6.5：任何显式列列表都渲染为空，即使列出全部五个列名（`SELECT id, markdown, content, type, hpath`）仍为空，只有 `SELECT *` 能渲染。思源嵌入块要求完整的 `blocks` 行对象，不接受列列表。这与 MCP `search query_sql`（只取数据不渲染，部分列可用）是关键差异。
+- 只能渲染 `blocks` 表的行（每行就是一个内容块）。SQL 内可 `JOIN attributes / refs / spans` 等辅助筛选，但 `SELECT` 列表必须是 `blocks.*`。
 - 真实陷阱一：当前文档自身往往也命中查询条件，结果列表里会出现"自己嵌入自己"。在 `WHERE` 加 `AND root_id != '<当前 docId>'` 排除。
 - 真实陷阱二：要查任务勾选状态（`- [ ]` / `- [x]`）必须用 `markdown` 字段，不要用 `content`（content 已剥离 markdown 标记）。
 - 真实陷阱三：SQL 命中但 UI 显示"不存在符合条件的内容块"——嵌入块复用「设置 → 搜索 → 类型」勾选状态，被关掉的类型即使 SQL 查得到也不渲染。先用 `search query_sql` 验证 SQL 是否真的命中；命中却不渲染才让用户去开类型。`type='p'` / `type='h'` 默认开启，无需调设置（见上文 type 选择指南）。

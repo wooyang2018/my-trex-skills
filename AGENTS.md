@@ -6,7 +6,7 @@
 
 **A. 原生能力（`plugins/siyuan-skills/`）**
 1. **底层 CLI 操作** — `siyuan-sisyphus` 技能提供思源笔记 CLI 的完整参考
-2. **知识库引擎** — `llm-wiki` + 8 个 wiki 技能提供基于 Karpathy LLM Wiki 模式的知识蒸馏系统
+2. **知识库引擎** — `llm-wiki` 技能（含 setup/ingest/query/audit/maintain 五大操作入口）提供基于 Karpathy LLM Wiki 模式的知识蒸馏系统
 3. **网页提取** — `defuddle` 技能提取干净 Markdown
 
 **B. 迁入的职能插件（`plugins/`，来自 agent-plugins）** — 前端开发、Go 开发、项目工程化、设计、产品管理、spec 工作流、外部 CLI agent 分流。
@@ -28,15 +28,8 @@
 
 | 技能 | 触发场景 | 核心能力 |
 |------|----------|----------|
-| **llm-wiki** | 理解 wiki 模式、存储协议、页面模板 | 三层架构 + 存储原语 + 页面模板（理论基石） |
-| **wiki-setup** | "set up my wiki" / "初始化" / "切换笔记本" / "列出我的 wiki" | 创建笔记本结构、特殊文档、配置；管理多笔记本配置切换 |
-| **wiki-ingest** | "ingest" / "add this to wiki" / "/ingest-url" / "/wiki-capture" / "/wiki-history-ingest" | 统一摄取入口——文档蒸馏、URL 获取、数据导入、对话捕获、历史导入 |
-| **wiki-retrieval** | "what do I know about X" | 从 wiki 回答问题（分层检索） |
-| **wiki-lint** | "audit" / "lint" / "日常更新" / "状态如何" / "wiki 洞察" | 健康审计 + 日常维护周期 + 状态审计 + 图谱洞察分析 |
-| **wiki-graph** | "dedup" / "cross-link" / "fix my tags" / "color my graph" | 去重合并 + 交叉链接 + 标签分类法 + 图谱着色 |
-| **wiki-report** | "create a dashboard" / "weekly digest" / "context pack" | SQL 仪表板 + 周/月摘要 + Token 受限上下文包 |
-| **wiki-synthesis** | "synthesize my wiki" / "wiki-research" | 发现并填补综合缺口 + 自主多轮网络研究 |
-| **deep-study** | "深入研究《X》" / "研读 GO 圣经" / "调研 X 的原理和实战" / "面试级深度研究" | 面试与项目实践级深度学习——书籍系统研读 + 多源专项调研，产出面试追问链+实践方案，沉淀到 wiki（concept+闪卡+预填深入段 L4）|
+| **llm-wiki** | wiki 初始化 / 摄取 / 查询 / 审计 / 维护 | 单一技能集成五大操作入口（setup/ingest/query/audit/maintain）——统管存储协议、页面模板、分层检索、质量审计与自动派生 |
+| **deep-study** | "深入研究《X》" / "研读 GO 圣经" / "调研 X 的原理和实战" / "面试级深度研究" | 面试与项目实践级深度学习——书籍系统研读 + 多源专项调研，产出面试追问链+实践方案，沉淀到 wiki（concept+4 种题型闪卡+预填深入段 L4）|
 
 ### B. 迁入职能插件（`plugins/`）
 
@@ -114,7 +107,6 @@ siyuan-sisyphus notebook list
 $SIYUAN_NOTEBOOK_NAME (notebook root)
 ├── index                   # 主索引 — 每个页面都列出
 ├── log                     # 时间线活动日志（block append）
-├── hot                     # 会话热缓存 — ~500 词语义快照
 ├── _insights               # 图分析输出
 ├── _staging/               # 暂存审查队列（WIKI_STAGED_WRITES=true 时）
 ├── _archives/              # 归档快照
@@ -158,7 +150,7 @@ siyuan-sisyphus block set_attrs --id <doc-id> \
 | `comparisons/` | 草拟全文，status/confidence 自动派生 | draft | low | — |
 | `contradictions/` | 检测并创建，status 由 Resolution Status 决定 | draft | low (恒定) | — |
 
-`custom-status`、`custom-confidence`、`custom-depth` 三个字段由 maintain 周期自动派生，**不需要人工维护**。confidence 由来源数量决定（0-1→low, 2→medium, 3+→high）；status 由时间+来源+矛盾状态决定；depth 由闪卡复习表现决定（concept 页面包含 L1/L2/L3 三层闪卡，复习表现自动决定 depth）。references/ 因事实性强、错误易对照源发现，由 AI 完全写入。
+`custom-status`、`custom-confidence`、`custom-depth` 三个字段由 maintain 周期自动派生，**不需要人工维护**。confidence 由来源数量决定（0-1→low, 2→medium, 3+→high）；status 由时间+来源+矛盾状态决定；depth 由闪卡复习表现决定（concept 页面包含 L1-L4 四种题型闪卡，复习表现自动决定 depth）。references/ 因事实性强、错误易对照源发现，由 AI 完全写入。
 
 ### 检索原语 — 分层检索（成本递增）
 
@@ -224,7 +216,7 @@ wiki 页面之间的所有内部链接写为思源原生块引用：
 
 **确认话术模板**：「准备执行 `<命令摘要>`，将影响 `<具体目标>`，是否继续？」
 
-写类技能需要笔记本 `rwd` 权限；读类技能（`wiki-retrieval`、`wiki-lint` 的状态审计/洞察模式）接受 `r` / `rw` / `rwd` 任一。
+写类技能需要笔记本 `rwd` 权限；读类技能（`llm-wiki` 的 query/maintain 模式）接受 `r` / `rw` / `rwd` 任一。
 
 ---
 
@@ -260,7 +252,7 @@ wiki 页面之间的所有内部链接写为思源原生块引用：
 
 ### 各插件编辑原则
 
-- **原生 skills（defuddle / siyuan-sisyphus / llm-wiki / wiki-*，位于 `plugins/siyuan-skills/`)** — 可直接编辑 `SKILL.md` 与 `references/`。
+- **原生 skills（defuddle / siyuan-sisyphus / llm-wiki / deep-study，位于 `plugins/siyuan-skills/`)** — 可直接编辑 `SKILL.md` 与 `references/`。
 - **frontend-dev / project-craft** — 可直接编辑 `SKILL.md` 与 `references/`。
 - **go-dev** — 可直接编辑 `SKILL.md`。原有三个（`go`、`cobra-viper`、`go-spec-reviewer`）来自 spf13，`golang-*` 系列来自 samber，直接复制。
 - **playwright-cli skill**（frontend-dev 下）— 不手改，靠 `playwright-cli install --skills` 重新生成。

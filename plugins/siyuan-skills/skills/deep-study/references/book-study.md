@@ -40,12 +40,12 @@ siyuan-sisyphus search fulltext --query "<书名/核心概念>" --page 1 --page-
 
 | 层级 | 书中通常提供 | deep-study 补足 |
 |---|---|---|
-| L1 定义 | ✓ | 提炼一句话定义 + 核心特征 |
-| L2 原理 | ✓（通常详细） | 压缩为机制要点 |
-| L3 动机 | 部分 | 补足替代方案和权衡（书里常只讲"是什么"不讲"为什么不那样"） |
-| L4 实战 | 常缺失 | **书籍研读的关键增量**——用 `research_subagent` 联网补足生产踩坑 / 面试热点 / 实践项目 |
+| L1 定义 | ✓ | 提炼一句话定义 + 核心特征（≥ 200 字） |
+| L2 原理 | ✓（通常详细） | 压缩为机制要点（≥ 800 字，含 ≥ 1 处源码引用、≥ 3 个量化数据） |
+| L3 动机 | 部分 | 补足替代方案和权衡（≥ 500 字，含 ≥ 2 个被放弃的替代方案） |
+| L4 实战 | 常缺失 | **书籍研读的关键增量**——用 `research_subagent` 联网补足生产踩坑 / 面试热点 / 实践项目（≥ 3 条 Common Pitfalls、≥ 6 个 Interview Questions） |
 
-L4 联网补足：对每个概念，调度 1 个 `research_subagent` 搜索"<概念> production pitfalls / interview questions / real-world usage"，T0/T1 来源优先。
+L4 联网补足：对每个概念，调度 1 个 `research_subagent` 搜索"<概念> production pitfalls / interview questions / real-world usage"，T0/T1 来源优先，工具预算 15-25 次。subagent 的 task 须包含 3-5 个具体问题（见 `topic-research.md` 的细化示例）。
 
 ### 4. 生成 concept 页面
 

@@ -42,7 +42,6 @@ description: >
 ```text
 index
 log
-hot
 audit/
 concepts/
 references/
@@ -112,14 +111,15 @@ journal/
 
 **custom-depth**（由闪卡复习表现决定，maintain 周期重算）：
 
-每个 concept 页面包含 3 个层次的闪卡（L1 定义填空/L2 原理问答/L3 动机问答）。maintain 周期读取闪卡复习状态，按以下规则派生 depth：
+每个 concept 页面包含 4 种题型的闪卡（L1 填空 cloze/L2 问答 qa/L3 单选 single-choice/L4 多选 multi-choice）。maintain 周期读取闪卡复习状态，按以下规则派生 depth：
 
 | 条件 | depth |
 |---|---|
 | L1 卡片不存在或从未复习（在 new 列表中） | beginner |
 | L1 已复习但 L2 不存在或未复习 | beginner |
 | L1+L2 均已复习但 L3 不存在或未复习 | intermediate |
-| L1+L2+L3 均已复习（在 old 列表中，reps > 0） | advanced |
+| L1+L2+L3 均已复习但 L4 不存在或未复习 | intermediate |
+| L1+L2+L3+L4 均已复习（在 old 列表中，reps > 0） | advanced |
 
 闪卡复习是深度的唯一衡量方式——你不需要自己判断"我理解到什么程度"，系统通过你能否答出不同层次的问题来客观衡量。
 
@@ -152,9 +152,9 @@ siyuan-sisyphus block set_attrs --id "<doc-id>" --attrs-json '{
   "custom-updated": "2026-06-28"
 }'
 
-# 步骤 3（仅 concepts/）：注册闪卡——找到 Flashcards 段的 3 个块（L1 段落块填空 + L2/L3 超级块问答），设 custom-card-level 属性，然后通过 CLI create_card 注册到 wiki-cards 牌组（deck ID 从 config 读取）
-siyuan-sisyphus search query_sql --sql "SELECT id, type FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<doc-id>' AND ((type='p' AND content LIKE '%L1（%') OR (type='s' AND (content LIKE '%L2（%' OR content LIKE '%L3（%'))) LIMIT 10" --json
-# 对每个块设 custom-card-level 属性（L2/L3 设在超级块上），然后 CLI create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" 注册（思源按块类型自动判定：段落含 ==标记== → 填空题；超级块 → 问答题；见 ingest.md 闪卡注册段）
+# 步骤 3（仅 concepts/）：注册闪卡——找到 Flashcards 段的 4 个块（L1 段落块填空 + L2/L3/L4 超级块），设 custom-card-level 属性，然后通过 CLI create_card 注册到 wiki-cards 牌组（deck ID 从 config 读取）
+siyuan-sisyphus search query_sql --sql "SELECT id, type FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND root_id='<doc-id>' AND ((type='p' AND content LIKE '%L1（%') OR (type='s' AND (content LIKE '%L2（%' OR content LIKE '%L3（%' OR content LIKE '%L4（%')))) LIMIT 10" --json
+# 对每个块设 custom-card-level 属性（L2/L3/L4 设在超级块上），然后 CLI create_card --deck-id "$SIYUAN_FLASHCARD_DECK_ID" 注册（思源按块类型自动判定：段落含 ==标记== → 填空题；超级块 → 问答题；见 ingest.md 闪卡注册段）
 ```
 
 写入后用 `fs read` 或 `document lookup` 验证；不要用全文搜索验证刚写入的内容。
@@ -165,13 +165,16 @@ siyuan-sisyphus search query_sql --sql "SELECT id, type FROM blocks WHERE box='$
 
 ### 嵌入块 — 动态视图
 
-在 `index` 等系统页面中用嵌入块做动态查询视图，替代手工维护列表：
+嵌入块在 `index` 等系统页面做动态查询。SiYuan 3.6.5 实测约束：**必须 `SELECT *`**（任何列列表都渲染空），而 `SELECT *` + `type='d'` 会展开整页正文淹没索引。
 
-```markdown
-{{ SELECT id, hpath, content FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND type='d' AND hpath LIKE '/concepts/%' ORDER BY updated DESC LIMIT 10 }}
-```
+**选型**：紧凑列表 → 静态 `((doc-id 'title'))` 块引用（index 主用，每次 ingest 后更新）；动态监控 → 嵌入块查 `type='h'` 标题块（渲染 section 名而非整页）。
 
-注意：嵌入块 SQL 必须排除当前文档自身（`AND root_id != '<当前docId>'`），且 `SELECT` 列表必须包含渲染所需列。
+**嵌入块规则**：
+- `SELECT *`，必须排除当前文档 `AND root_id != '<当前docId>'`
+- `{{ }}` 必须独占一行，前后留空行（紧挨文字会变段落）
+- `type='d'` 渲染整页正文；概念文档无 h1 标题块（h1 是 frontmatter 元数据）
+
+详见 `siyuan-sisyphus/references/markup-guide.md` 嵌入块段。
 
 ### Callout — 视觉标注
 

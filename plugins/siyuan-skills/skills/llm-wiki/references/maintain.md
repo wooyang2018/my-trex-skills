@@ -4,7 +4,7 @@ Use this for health checks, light graph cleanup, audit archiving, and periodic m
 
 ## Checks
 
-- Missing required roots: `index`, `log`, `hot`, `audit`, category roots (`concepts`, `references`, `synthesis`, `comparisons`, `contradictions`), learning roots (`projects`, `journal`).
+- Missing required roots: `index`, `log`, `audit`, category roots (`concepts`, `references`, `synthesis`, `comparisons`, `contradictions`), learning roots (`projects`, `journal`).
 - Pages missing any of the 9 required `custom-*` attributes: `custom-title`, `custom-category`, `custom-tags`, `custom-sources`, `custom-summary`, `custom-status`, `custom-confidence`, `custom-depth` (concepts/ only), `custom-updated`.
 - Open audits older than the user's tolerance.
 - Duplicate titles or near-identical hpaths.
@@ -74,7 +74,7 @@ siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_D
 siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_DECK_ID" --filter new --page 1 --page-size 1000 --json
 ```
 
-4. For each concept, match its L1/L2/L3 block IDs to card states:
+4. For each concept, match its L1/L2/L3/L4 block IDs to card states:
    - Cards in the `old` list (reps > 0) = reviewed = counts for depth
    - Cards in the `new` list (reps = 0, state = 0) = not reviewed = doesn't count
    - Cards not in either list = not registered as flashcards
@@ -86,7 +86,8 @@ siyuan-sisyphus flashcard list_cards --scope deck --deck-id "$SIYUAN_FLASHCARD_D
 | L1 card not found or in `new` list | beginner |
 | L1 reviewed but L2 not found or in `new` list | beginner |
 | L1+L2 reviewed but L3 not found or in `new` list | intermediate |
-| L1+L2+L3 all reviewed | advanced |
+| L1+L2+L3 reviewed but L4 not found or in `new` list | intermediate |
+| L1+L2+L3+L4 all reviewed | advanced |
 
 6. Update `custom-depth` via `block set_attrs` where the value changed.
 
@@ -167,7 +168,7 @@ Count rows by depth value (beginner/intermediate/advanced). Depth is auto-derive
 siyuan-sisyphus search query_sql --sql "SELECT b.id, b.hpath FROM blocks b WHERE b.box='$SIYUAN_NOTEBOOK_ID' AND b.type='d' AND b.hpath LIKE '/concepts/%' AND b.id NOT IN (SELECT DISTINCT root_id FROM blocks WHERE id IN (SELECT block_id FROM attributes WHERE name='custom-card-level')) LIMIT 500" --json
 ```
 
-For each concept page, also verify it has 3 flashcard blocks (L1/L2/L3). Concepts with missing or partial flashcards need card creation — run the flashcard registration step from `ingest.md`.
+For each concept page, also verify it has 4 flashcard blocks (L1-L4). Concepts with missing or partial flashcards need card creation — run the flashcard registration step from `ingest.md`.
 
 ## Safe defaults
 
@@ -186,7 +187,7 @@ Use `search get_backlinks --id <doc-id> --mode both --json` for backlink checks.
 
 Use this when the user asks to archive resolved audit documents. This is a destructive move operation, so confirm first:
 
-> 准备将 `audit/` 下 `custom-status=resolved` 或 frontmatter `status: resolved` 的审计文档移动到 `audit/resolved/`，是否继续？
+> 准备将 `audit/` 下 `custom-status=resolved` 的审计文档移动到 `audit/resolved/`，是否继续？
 
 After explicit approval:
 

@@ -29,7 +29,7 @@ SiYuan auto-generates a frontmatter block and `# Title` heading for every docume
 
 **核心段**（必填，AI 草拟）：定义、How It Works、Examples、Related、Sources
 **深入段**（面试关键，人工补充为主）：In My Own Words、Why This Way、When to Use / When Not、Common Pitfalls、Interview Questions、Practice Ideas
-**闪卡段**（AI 生成，自动注册）：Flashcards — 3 个层次的闪卡（L1 定义填空/L2 原理问答/L3 动机问答），注册到思源闪卡系统，复习表现自动派生 `custom-depth`
+**闪卡段**（AI 生成，自动注册）：Flashcards — 4 种题型的闪卡（L1 填空/L2 问答/L3 单选/L4 多选），注册到思源闪卡系统，复习表现自动派生 `custom-depth`
 
 深入段是面试加分的关键。AI 草拟时可以预填能推断的内容（如从来源提取的 Examples、Common Pitfalls），但 `## In My Own Words` 和 `## Interview Questions` 必须人工填写——前者是费曼复述验证理解，后者是面试追问的预案。深入段留空不影响页面创建，但 lint 会报告"深入段缺失"提醒你回头补充。`## Flashcards` 段由 AI 生成，不需要人工填写——它是深度衡量的客观依据。
 
@@ -86,20 +86,42 @@ One-sentence definition.
 ## Flashcards
 
 > [!NOTE]
-> AI 生成 3 个层次的闪卡，注册到思源闪卡系统。L1 为填空题（段落块，用 `==标记==` 挖空核心术语与特征，复习时回想填入）；L2/L3 为问答题（超级块 `{{{row}}}`，首子块=问题、其余子块=答案，复习先回想再翻答案）。复习表现自动决定 custom-depth，不需要自己判断理解深度。
+> AI 生成 4 种题型的闪卡，注册到思源闪卡系统。L1 填空题（段落 `==mark==` 挖空核心术语，custom-card-type=cloze）；L2 问答题（超级块 `{{{row}}}`，首子块=问题、其余=答案，custom-card-type=qa）；L3 单选题（嵌套超级块，正面=题干+选项、背面=答案+解析，custom-card-type=single-choice）；L4 多选题（嵌套超级块，正面=题干+任务列表、背面=答案+解析，custom-card-type=multi-choice）。复习表现自动决定 custom-depth，不需要自己判断理解深度。
 
-L1（定义）==X== 是 <一句话定义>，核心特征包括 ==特征1==、==特征2==。
+L1（定义，custom-card-type=cloze）==X== 是 <一句话定义>，核心特征包括 ==特征1==、==特征2==。
 
 {{{row
-L2（原理）X 是如何工作的？什么场景适合用，什么场景不适合？
+L2（原理，custom-card-type=qa）X 是如何工作的？什么场景适合用，什么场景不适合？
 
 <简明原理与适用/不适用场景，1-2 句>
 }}}
 
 {{{row
-L3（动机）为什么 X 这样设计？这个设计放弃了什么替代方案？
+{{{row
+L3（动机，custom-card-type=single-choice）关于 X 的设计动机，以下哪项是正确的？
 
-<简明设计动机与被放弃的替代方案，1-2 句>
+- A. <正确选项>
+- B. <干扰项>
+- C. <干扰项>
+- D. <干扰项>
+}}}
+
+答案：A。<解析：关键设计动机与被放弃的替代方案，1-2 句>
+}}}
+
+{{{row
+{{{row
+L4（实战，custom-card-type=multi-choice）以下哪些是使用 X 时的常见陷阱？
+
+- [ ] <陷阱 1>
+- [ ] <非陷阱干扰项>
+- [ ] <陷阱 2>
+- [ ] <陷阱 3>
+}}}
+
+答案：<正确选项>。
+
+解析：<每条陷阱的简要说明，1-3 句>
 }}}
 
 ## Related
@@ -158,20 +180,42 @@ One-sentence description in this wiki's scope.
 ## Flashcards
 
 > [!NOTE]
-> AI 生成 3 个层次的闪卡，注册到思源闪卡系统。L1 为填空题（段落块，用 `==标记==` 挖空核心术语与特征）；L2/L3 为问答题（超级块 `{{{row}}}`，首子块=问题、其余子块=答案）。复习表现自动决定 custom-depth。
+> AI 生成 4 种题型的闪卡，注册到思源闪卡系统。L1 填空题（段落 `==mark==` 挖空核心术语，custom-card-type=cloze）；L2 问答题（超级块 `{{{row}}}`，首子块=问题、其余=答案，custom-card-type=qa）；L3 单选题（嵌套超级块，正面=题干+选项、背面=答案+解析，custom-card-type=single-choice）；L4 多选题（嵌套超级块，正面=题干+任务列表、背面=答案+解析，custom-card-type=multi-choice）。复习表现自动决定 custom-depth。
 
-L1（定义）==X== 是 <一句话描述>，核心特征包括 ==特征1==、==特征2==。
+L1（定义，custom-card-type=cloze）==X== 是 <一句话描述>，核心特征包括 ==特征1==、==特征2==。
 
 {{{row
-L2（原理）X 如何解决它解决的问题？常见的使用场景有哪些？
+L2（原理，custom-card-type=qa）X 如何解决它解决的问题？常见的使用场景有哪些？
 
 <简明解决方式与使用场景，1-2 句>
 }}}
 
 {{{row
-L3（动机）为什么选择 X 而不是替代方案？它的关键权衡是什么？
+{{{row
+L3（动机，custom-card-type=single-choice）关于选择 X 而非替代方案，以下哪项是正确的？
 
-<简明选择动机与关键权衡，1-2 句>
+- A. <正确选项>
+- B. <干扰项>
+- C. <干扰项>
+- D. <干扰项>
+}}}
+
+答案：A。<解析：关键权衡与选择动机，1-2 句>
+}}}
+
+{{{row
+{{{row
+L4（实战，custom-card-type=multi-choice）使用 X 时，以下哪些是正确的做法？
+
+- [ ] <正确做法 1>
+- [ ] <错误做法干扰项>
+- [ ] <正确做法 2>
+- [ ] <正确做法 3>
+}}}
+
+答案：<正确选项>。
+
+解析：<每条选项的简要说明，1-3 句>
 }}}
 
 ## Related
@@ -414,16 +458,16 @@ Use these native features to enhance the wiki without external tools.
 
 ### Embed blocks — dynamic views
 
-In system pages like `index`, use embed blocks for dynamic query views:
+Embed blocks run SQL at render time in `index` etc. SiYuan 3.6.5 constraint: **must `SELECT *`** (any column list renders empty), and `SELECT *` + `type='d'` expands full page body — drowns the index.
 
-```markdown
-{{ SELECT id, hpath, content FROM blocks WHERE box='$SIYUAN_NOTEBOOK_ID' AND type='d' AND hpath LIKE '/concepts/%' AND root_id != '<current-doc-id>' ORDER BY updated DESC LIMIT 10 }}
-```
+**Choose**: compact list → static `((doc-id 'title'))` block refs (index main use, update after each ingest); dynamic monitoring → embed block querying `type='h'` heading blocks (renders section names, not full pages).
 
-Common dynamic views:
-- Recent updates: `ORDER BY updated DESC LIMIT 10`
-- Pending drafts: `JOIN attributes a ON a.block_id = b.id WHERE a.name = 'custom-status' AND a.value = 'draft'`
-- Open contradictions: `hpath LIKE '/contradictions/%'` with `custom-status` = draft
+**Rules**:
+- `SELECT *`, must exclude current doc `AND root_id != '<current-doc-id>'`
+- `{{ }}` must be on its own line with blank lines around it (text prefix turns it into a paragraph)
+- `type='d'` renders full page body; concept docs have no h1 heading block (h1 is frontmatter metadata)
+
+See `siyuan-sisyphus/references/markup-guide.md` embed block section for details.
 
 ### Callouts — visual annotations
 

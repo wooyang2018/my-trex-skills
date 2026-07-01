@@ -37,9 +37,11 @@ description: >
 3. **产物默认写 wiki**：研究完成后，按 llm-wiki 的 ingest 流程（`../llm-wiki/references/ingest.md`）+ writing 模板（`../llm-wiki/references/writing.md`）写入 wiki。concept 页面须注册 4 种题型闪卡（填空 / 问答 / 单选 / 多选，见下方"闪卡题型构造"），复用 ingest.md 的注册 SQL 和 `create_card` 流程，新增 `custom-card-type` 属性标记题型。
 4. **L4 深度必达**：每个 concept 必须达到 L4 深度（见 `references/depth-standard.md`）——预填 concept 模板的 Interview Questions、Common Pitfalls、Practice Ideas 深入段（标准 ingest 留空给人工，deep-study 必须预填能推断的实战内容）。未达 L4 的页面保持 `custom-status=draft` 并在日志注明"待深化"。
 5. **多源质量分级**：topic-research 的调研须覆盖多类来源并按质量分级（见 `references/topic-research.md`）——T0 权威源（官方文档 / 规范 / 顶会论文 / 源码）优先，T1 高质量源（知名工程师博客 / 公司技术博客 / 优质中文公众号），T2 补充源（Stack Overflow / GitHub issues）仅作交叉验证。T0 之间冲突时记入 `contradictions/`。
-6. **复用 research_subagent**：topic-research 的并行调研用 Task 工具调度 `research_subagent`（本技能不自带 agents/）。每个 subagent 负责一个研究维度 + 来源质量要求，OODA 循环，工具调用预算 5-15 次。
+6. **复用 research_subagent**：topic-research 的并行调研用 Task 工具调度 `research_subagent`（本技能不自带 agents/）。每个 subagent 负责一个研究维度 + 来源质量要求，OODA 循环。工具调用预算 **15-25 次 / subagent**（源码追踪维度 30 次），低于 15 次几乎不可能产出有深度的内容。subagent 的 task 须包含 3-5 个**具体问题**（不是一句话维度描述）。第一轮调研后必须执行 Gap Analysis，对缺口调度第二轮定向 subagent（见 `references/topic-research.md`）。
 7. **三件套必交**：每个研究主题必交面试追问链（5-10 递进问题 + 答题方向）、实践方案（代码 / 架构 / 踩坑预案）、wiki 摄取（concept + references + 4 种题型闪卡）。见 `references/deliverable.md`。
 8. **危险动作确认**：遵循 AGENTS.md 危险动作清单（`fs rm` / `mv`、`remove_card` 等须复述目标与影响并取得明确批准）。
+9. **源码强制追踪**：topic-research 至少一个维度必须做源码追踪——实际读取源码（GitHub raw 或本地仓库），提取函数签名、调用链、关键数据结构、行号引用。concept 页面的 `## How It Works` 段须包含 ≥ 1 处源码引用（如 `runtime/mgc.go:L234`）。不是"提到了源码文件名"，而是实际读了源码并提取了关键信息。
+10. **量化深度标准 + 对抗性面试验证**：concept 页面每段须达到量化深度要求（见 `references/depth-standard.md`）：How It Works ≥ 800 字含 ≥ 3 个量化数据、Common Pitfalls ≥ 3 条、Interview Questions ≥ 6 个含 ≥ 1 个 L4 级"杀手问题"。写入 wiki 前必须执行对抗性面试验证——以面试官身份提出 3 个刁钻追问，检查 concept 草稿能否回答，不能回答的补充正文或追问链。
 
 ## 与 llm-wiki 的关系
 
